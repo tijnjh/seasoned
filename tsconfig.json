@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "rewriteRelativeImportExtensions": true,
+    "moduleResolution": "bundler",
+    "paths": {
+      "$lib/*": ["./src/lib/*"]
+    },
+    "resolveJsonModule": true,
+    "resolvePackageJsonImports": true,
+    "types": ["vite/client", "node"],
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "noEmit": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "vite.config.ts", "eslint.config.js"]
+}
