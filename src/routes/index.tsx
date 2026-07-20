@@ -73,7 +73,7 @@ function RouteComponent() {
             const watchedEpisodeCount
               = watchedTvShows.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
             const totalEpisodeCount = tvShow.seasons.reduce(
-              (total, season) => total + season.episode_count,
+              (total, season) => total + (season.season_number === 0 ? 0 : season.episode_count),
               0,
             )
             const allWatched = totalEpisodeCount > 0
