@@ -1,4 +1,4 @@
-import { IonAvatar, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react'
+import { IonAvatar, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSearchbar, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useHistory } from 'react-router'
@@ -10,7 +10,7 @@ import { getSrcFromPath } from '#lib/utils'
 export function HomePage() {
   const history = useHistory()
 
-  const { data: watchedTvShows } = useQuery({
+  const { data: watchedTvShows, isLoading } = useQuery({
     queryKey: ['watched-tv-shows'],
     queryFn: async () => getWatchedTvShows(),
   })
@@ -61,6 +61,8 @@ export function HomePage() {
             value={query}
           />
         </form>
+
+        {isLoading && <IonSpinner className="my-8 w-full" />}
 
         <IonList>
           {sortedTvShows.map((tvShow) => {

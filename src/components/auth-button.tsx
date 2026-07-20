@@ -27,7 +27,7 @@ export function AuthButton() {
     )
   }
 
-  if (!session) {
+  if (!session?.user) {
     return (
       <IonButton
         fill="clear"

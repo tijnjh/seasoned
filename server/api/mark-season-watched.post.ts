@@ -2,7 +2,7 @@ import { defineEventHandler } from 'nitro/h3'
 import * as v from 'valibot'
 import { tmdb } from './_lib/tmdb'
 import { getSafeQuery } from './_lib/utils'
-import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history.server'
+import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history'
 
 const handler = defineEventHandler(async (event) => {
   const params = getSafeQuery(event, v.object({
@@ -11,7 +11,7 @@ const handler = defineEventHandler(async (event) => {
     seasonNumber: v.pipe(v.string(), v.toNumber()),
   }))
 
-  const historyStore = await getWatchHistoryStore()
+  const historyStore = await getWatchHistoryStore(event)
 
   if (!historyStore) {
     throw new Error('You must be signed in to save watched episodes.')

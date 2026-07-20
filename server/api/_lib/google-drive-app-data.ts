@@ -7,9 +7,7 @@ export interface AppDataStore<T> {
   write: (value: T) => Promise<void>
 }
 
-export function createGoogleDriveAppDataStore<T>(
-  googleDrive: drive_v3.Drive,
-): AppDataStore<T> {
+export function createGoogleDriveAppDataStore<T>(googleDrive: drive_v3.Drive): AppDataStore<T> {
   let appDataFileId: string | undefined
 
   async function findAppDataFile() {

@@ -1,9 +1,9 @@
 import { defineEventHandler } from 'nitro/h3'
 import { tmdb } from './_lib/tmdb'
-import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history.server'
+import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history'
 
-const handler = defineEventHandler(async () => {
-  const historyStore = await getWatchHistoryStore()
+const handler = defineEventHandler(async (event) => {
+  const historyStore = await getWatchHistoryStore(event)
 
   if (!historyStore) {
     return {

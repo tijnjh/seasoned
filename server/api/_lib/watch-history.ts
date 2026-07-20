@@ -1,6 +1,8 @@
+import type { EventHandlerRequest, H3Event } from 'nitro/h3'
 import type { AppDataStore } from './google-drive-app-data'
 import { drive, auth as googleAuth } from '@googleapis/drive'
-import { auth } from '../../../src/lib/auth'
+import { setHeader } from 'nitro/h3'
+import { auth } from './auth'
 import { createGoogleDriveAppDataStore } from './google-drive-app-data'
 
 interface WatchedEpisode {
@@ -13,11 +15,11 @@ interface WatchHistory {
   watchedEpisodes: WatchedEpisode[]
 }
 
-export async function getWatchHistoryStore() {
-  // const headers = getRequestHeaders()
+export async function getWatchHistoryStore(event: H3Event<EventHandlerRequest>) {
+  const headers = Object.fromEntries(event.req.headers.entries())
+
   const session = await auth.api.getSession({
-    headers: {},
-    // headers
+    headers,
   })
 
   if (!session) {
@@ -26,14 +28,14 @@ export async function getWatchHistoryStore() {
 
   const tokenResult = await auth.api.getAccessToken({
     body: { providerId: 'google' },
-    // headers,
+    headers,
     returnHeaders: true,
   })
 
   const setCookieHeaders = tokenResult.headers.getSetCookie()
 
   if (setCookieHeaders.length > 0) {
-    // setResponseHeader('set-cookie', setCookieHeaders)
+    setCookieHeaders.forEach(cookie => event.res.headers.append('set-cookie', cookie))
   }
 
   const oauth2Client = new googleAuth.OAuth2()
