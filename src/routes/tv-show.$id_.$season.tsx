@@ -1,6 +1,7 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonLoading, IonNote, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonLoading, IonNote, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { RouterBackButton } from '#components/router-back-button'
 import { authClient } from '#lib/auth-client'
 import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, toggleWatchedEpisode } from '#lib/server-functions'
 
@@ -96,7 +97,10 @@ function RouteComponent() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref={`/tv-show/${id}`} />
+            <RouterBackButton
+              fallbackTo="/tv-show/$id"
+              params={{ id }}
+            />
           </IonButtons>
 
           <IonTitle>

@@ -1,6 +1,7 @@
-import { IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
+import { IonBadge, IonButtons, IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { RouterBackButton } from '#components/router-back-button'
 import { RouterItem } from '#components/router-item'
 import { getTvShow, getWatchedEpisodeCounts } from '#lib/server-functions'
 
@@ -40,7 +41,7 @@ function RouteComponent() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/" />
+            <RouterBackButton fallbackTo="/" />
           </IonButtons>
 
           <IonTitle>{tvShow.name}</IonTitle>

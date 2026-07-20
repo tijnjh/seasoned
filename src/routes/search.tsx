@@ -1,6 +1,8 @@
-import { IonAvatar, IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
-import { createFileRoute, createLink } from '@tanstack/react-router'
+import { IonAvatar, IonButtons, IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
+import { createFileRoute } from '@tanstack/react-router'
 import * as v from 'valibot'
+import { RouterBackButton } from '#components/router-back-button'
+import { RouterItem } from '#components/router-item'
 import { search } from '#lib/server-functions'
 import { getSrcFromPath } from '#lib/utils'
 
@@ -20,8 +22,6 @@ export const Route = createFileRoute('/search')({
   component: RouteComponent,
 })
 
-const RouterItem = createLink(IonItem)
-
 function RouteComponent() {
   const { results } = Route.useLoaderData()
 
@@ -30,7 +30,7 @@ function RouteComponent() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/" />
+            <RouterBackButton fallbackTo="/" />
           </IonButtons>
 
           <IonTitle>Search results</IonTitle>

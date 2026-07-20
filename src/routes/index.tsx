@@ -28,8 +28,6 @@ function RouteComponent() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle slot="start">Episcoped</IonTitle>
-
           <IonButtons slot="end">
             <AuthButton />
           </IonButtons>
