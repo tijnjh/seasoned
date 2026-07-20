@@ -73,6 +73,7 @@ export function AuthButton() {
               void signOut()
             },
           },
+          { text: 'Cancel', role: 'cancel' },
         ]}
       />
     </>

@@ -2,6 +2,7 @@ import type { RouteComponentProps } from 'react-router'
 import { IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
 import { getTvShow, getWatchedEpisodeCounts } from '#lib/api'
+import { seasonLabelByNumber } from '#lib/utils'
 
 export function TvShowDetailPage({ match }: RouteComponentProps<{ tvShowId: string }>) {
   const tvShowId = Number(match.params.tvShowId)
@@ -22,7 +23,7 @@ export function TvShowDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/" text="Episcoped" />
+            <IonBackButton defaultHref="/" />
           </IonButtons>
 
           <IonTitle>{tvShow?.name}</IonTitle>
@@ -43,7 +44,7 @@ export function TvShowDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
                       key={season.id}
                       routerLink={`/tv-show/${tvShowId}/${season.season_number}`}
                     >
-                      {season.season_number || season.name}
+                      {seasonLabelByNumber(season.season_number)}
                       <IonBadge
                         slot="end"
                         color={badgeColor}

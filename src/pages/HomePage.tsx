@@ -1,10 +1,9 @@
-import { IonAvatar, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSearchbar, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
+import { IonButtons, IonContent, IonHeader, IonList, IonPage, IonSearchbar, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
-
-import { Searchbar } from '#components/searchbar'
+import { TvShowListing } from '#components/tv-show-listing'
 import { getWatchedTvShows } from '#lib/api'
-import { getSrcFromPath } from '#lib/utils'
 
 export function HomePage() {
   const { data: watchedTvShows, isLoading } = useQuery({
@@ -15,6 +14,9 @@ export function HomePage() {
   const sortedTvShows = [...(watchedTvShows?.tvShows ?? [])].sort((first, second) =>
     first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }),
   )
+
+  const [filterString, setFilterString] = useState('')
+  const filteredTvShows = sortedTvShows.filter(tvShow => tvShow.name.toLowerCase().includes(filterString.toLowerCase()))
 
   return (
     <IonPage>
@@ -28,7 +30,6 @@ export function HomePage() {
       </IonHeader>
 
       <IonContent>
-
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">
@@ -37,48 +38,14 @@ export function HomePage() {
           </IonToolbar>
         </IonHeader>
 
-        <Searchbar />
+        <IonSearchbar debounce={100} value={filterString} onIonInput={event => setFilterString(event.detail.value as string)} />
 
         {isLoading && <IonSpinner className="my-8 w-full" />}
 
         <IonList>
-          {sortedTvShows.map((tvShow) => {
-            const watchedEpisodeCount = watchedTvShows?.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
-            const totalEpisodeCount = tvShow.seasons.reduce(
-              (total, season) => total + (season.season_number === 0 ? 0 : season.episode_count),
-              0,
-            )
-            const allWatched = totalEpisodeCount > 0
-              && watchedEpisodeCount >= totalEpisodeCount
-            const badgeColor = allWatched
-              ? 'success'
-              : watchedEpisodeCount > 0 ? 'warning' : 'medium'
-
-            return (
-              <IonItem
-                key={tvShow.id}
-                routerLink={`/tv-show/${tvShow.id}`}
-              >
-                {tvShow.poster_path && (
-                  <IonAvatar slot="start">
-                    <img src={getSrcFromPath(tvShow.poster_path)} />
-                  </IonAvatar>
-                )}
-
-                {tvShow.name}
-
-                <IonBadge
-                  slot="end"
-                  color={badgeColor}
-                  aria-label={`${watchedEpisodeCount} of ${totalEpisodeCount} episodes watched`}
-                >
-                  {watchedEpisodeCount}
-                  /
-                  {totalEpisodeCount}
-                </IonBadge>
-              </IonItem>
-            )
-          })}
+          {filteredTvShows.map(tvShow => (
+            <TvShowListing key={tvShow.id} tvShow={tvShow} watchedTvShows={watchedTvShows} />
+          ))}
         </IonList>
       </IonContent>
 

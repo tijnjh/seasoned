@@ -1,7 +1,6 @@
 import type { EventHandlerRequest, H3Event } from 'nitro/h3'
 import type { AppDataStore } from './google-drive-app-data'
 import { drive, auth as googleAuth } from '@googleapis/drive'
-import { setHeader } from 'nitro/h3'
 import { auth } from './auth'
 import { createGoogleDriveAppDataStore } from './google-drive-app-data'
 

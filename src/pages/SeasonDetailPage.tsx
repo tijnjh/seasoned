@@ -1,8 +1,9 @@
 import type { RouteComponentProps } from 'react-router'
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonLoading, IonNote, IonPage, IonSpinner, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
+import { IonActionSheet, IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonLoading, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ellipsisHorizontal } from 'ionicons/icons'
 import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, toggleWatchedEpisode, unmarkSeasonWatched } from '#lib/api'
-import { authClient } from '#lib/auth-client'
+import { checkIfFutureDate, formatDate, seasonLabelByNumber } from '#lib/utils'
 
 export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: string, seasonNumber: string }>) {
   const tvShowId = Number(match.params.tvShowId)
@@ -95,8 +96,33 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
           </IonButtons>
 
           <IonTitle>
-            {tvSeasonQuery.data?.season_number === 0 ? tvSeasonQuery.data?.name : `Season ${tvSeasonQuery.data?.season_number}`}
+            {seasonLabelByNumber(tvSeasonQuery.data?.season_number)}
           </IonTitle>
+
+          <IonButtons slot="end">
+            <IonButton id="open-season-action-sheet">
+              <IonIcon icon={ellipsisHorizontal} />
+            </IonButton>
+            <IonActionSheet
+              trigger="open-season-action-sheet"
+              buttons={[
+                allEpisodesWatched
+                  ? {
+                      text: 'Mark all unwatched',
+                      handler: () => seasonWatchedMutation.mutate(false),
+                    }
+                  : {
+                      text: 'Mark all watched',
+                      handler: () => seasonWatchedMutation.mutate(true),
+                    },
+                {
+                  text: 'Cancel',
+                  role: 'cancel',
+                },
+              ]}
+            >
+            </IonActionSheet>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 
@@ -104,86 +130,36 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
         isOpen={toggleEpisodeMutation.isPending || seasonWatchedMutation.isPending}
       />
 
-      {isLoading
-        ? (
-            <IonContent>
+      <IonContent color="light">
+        {isLoading
+          ? <IonSpinner className="my-8 w-full" />
+          : (
+              <>
+                {(toggleEpisodeMutation.isError || seasonWatchedMutation.isError) && (
+                  <p role="alert">Could not save your watch history. Please try again.</p>
+                )}
 
-              <IonSpinner className="my-8 w-full" />
-            </IonContent>
-          )
-        : (
-            <IonContent>
-              {!watchedEpisodesQuery.data?.signedIn && (
-                <div className="flex items-center justify-between gap-4">
-                  <p>Sign in to track watched episodes.</p>
-                  <IonButton
-                    type="button"
-                    onClick={() => authClient.signIn.social({
-                      provider: 'google',
-                      callbackURL: `/tv-show/${tvShowId}/${seasonNumber}`,
-                    })}
-                  >
-                    Continue with Google
-                  </IonButton>
-                </div>
-              )}
-
-              {(toggleEpisodeMutation.isError || seasonWatchedMutation.isError) && (
-                <p role="alert">Could not save your watch history. Please try again.</p>
-              )}
-
-              {watchedEpisodesQuery.data?.signedIn && (
-                <IonItem lines="full">
-                  <IonLabel>
-                    <h2>Season progress</h2>
-                    <p>
-                      {watchedEpisodeCount}
-                      {' '}
-                      of
-                      {' '}
-                      {tvSeasonQuery.data?.episodes.length}
-                      {' '}
-                      episodes watched
-                    </p>
-                  </IonLabel>
-
-                  <IonButton
-                    slot="end"
-                    type="button"
-                    color={allEpisodesWatched ? 'success' : 'primary'}
-                    fill={allEpisodesWatched ? 'solid' : 'outline'}
-                    onClick={() => seasonWatchedMutation.mutate(!allEpisodesWatched)}
-                  >
-                    {seasonWatchedMutation.isPending
-                      ? 'Saving…'
-                      : allEpisodesWatched
-                        ? 'Mark unwatched'
-                        : 'Mark all watched'}
-                  </IonButton>
-                </IonItem>
-              )}
-
-              <IonList>
-                {tvSeasonQuery.data?.episodes.map(episode => (
-                  <IonItem key={episode.id} className="flex gap-3">
-                    <IonToggle
-                      checked={watchedEpisodeIds.has(episode.id)}
-                      onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
-                    >
+                <IonList>
+                  {tvSeasonQuery.data?.episodes.map(episode => (
+                    <IonItem key={episode.id}>
+                      <IonCheckbox
+                        slot="start"
+                        checked={watchedEpisodeIds.has(episode.id)}
+                        onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
+                        disabled={checkIfFutureDate(episode.air_date)}
+                      />
+                      <span className="truncate">{`${episode.episode_number}. ${episode.name}`}</span>
 
                       <IonLabel>
-                        {`${episode.episode_number}. ${episode.name}`}
+                        <p className="shrink-0 truncate text-right">{formatDate(episode.air_date)}</p>
                       </IonLabel>
 
-                      <IonNote color="medium">
-                        {episode.overview}
-                      </IonNote>
-                    </IonToggle>
-                  </IonItem>
-                ))}
-              </IonList>
-            </IonContent>
-          )}
+                    </IonItem>
+                  ))}
+                </IonList>
+              </>
+            )}
+      </IonContent>
     </IonPage>
   )
 }

@@ -1,9 +1,9 @@
-import { IonAvatar, IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
+import { IonContent, IonHeader, IonList, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocation } from 'react-router'
 import { Searchbar } from '#components/searchbar'
+import { TvShowListing } from '#components/tv-show-listing'
 import { search } from '#lib/api'
-import { getSrcFromPath } from '#lib/utils'
 
 export function SearchPage() {
   const location = useLocation()
@@ -19,18 +19,14 @@ export function SearchPage() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/" text="Episcoped" />
-          </IonButtons>
-
-          <IonTitle>Search results</IonTitle>
+          <IonTitle>Search</IonTitle>
+        </IonToolbar>
+        <IonToolbar>
+          <Searchbar initialValue={urlSearchParams.get('q') ?? undefined} />
         </IonToolbar>
       </IonHeader>
 
       <IonContent>
-
-        <Searchbar initialValue={urlSearchParams.get('q') ?? undefined} />
-
         {resultsQuery.isLoading
           ? (
               <IonSpinner className="my-8 w-full" />
@@ -38,21 +34,10 @@ export function SearchPage() {
           : (
               <IonList>
                 {resultsQuery.data?.results.map(result => (
-                  <IonItem
-                    routerLink={`/tv-show/${result.id}`}
-                    key={result.id}
-                  >
-                    {result.poster_path && (
-                      <IonAvatar slot="start">
-                        <img src={getSrcFromPath(result.poster_path)} />
-                      </IonAvatar>
-                    )}
-                    {result.name}
-                  </IonItem>
+                  <TvShowListing key={result.id} tvShow={result} />
                 ))}
               </IonList>
-            ) }
-
+            )}
       </IonContent>
     </IonPage>
   )
