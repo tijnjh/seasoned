@@ -110,9 +110,6 @@ function RouteComponent() {
 
       <IonLoading
         isOpen={toggleEpisodeMutation.isPending || markSeasonWatchedMutation.isPending}
-        message={markSeasonWatchedMutation.isPending
-          ? 'Marking season as watched…'
-          : 'Saving episode…'}
       />
 
       <IonContent>
