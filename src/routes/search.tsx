@@ -1,4 +1,4 @@
-import { IonAvatar, IonContent, IonItem, IonList, IonPage } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
 import { createFileRoute, createLink } from '@tanstack/react-router'
 import * as v from 'valibot'
 import { search } from '#lib/server-functions'
@@ -27,6 +27,16 @@ function RouteComponent() {
 
   return (
     <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/" />
+          </IonButtons>
+
+          <IonTitle>Search results</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+
       <IonContent>
         <IonList>
           {results.map(result => (

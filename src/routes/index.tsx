@@ -1,5 +1,5 @@
-import { IonAvatar, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSearchbar, IonToolbar } from '@ionic/react'
-import { createFileRoute, createLink } from '@tanstack/react-router'
+import { IonAvatar, IonButtons, IonContent, IonHeader, IonList, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
 import { RouterItem } from '#components/router-item'
@@ -28,6 +28,8 @@ function RouteComponent() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonTitle slot="start">Episcoped</IonTitle>
+
           <IonButtons slot="end">
             <AuthButton />
           </IonButtons>

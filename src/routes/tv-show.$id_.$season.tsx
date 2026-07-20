@@ -1,8 +1,8 @@
-import { IonButton, IonContent, IonHeader, IonItem, IonLabel, IonList, IonNote, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonLoading, IonNote, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { authClient } from '#lib/auth-client'
-import { getTvSeason, getTvShow, getWatchedEpisodes, toggleWatchedEpisode } from '#lib/server-functions'
+import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, toggleWatchedEpisode } from '#lib/server-functions'
 
 export const Route = createFileRoute('/tv-show/$id_/$season')({
   params: {
@@ -60,15 +60,45 @@ function RouteComponent() {
       })
     },
 
-    onSuccess: data => queryClient.setQueryData(watchedEpisodesQueryKey, data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(watchedEpisodesQueryKey, data)
+      void queryClient.invalidateQueries({
+        queryKey: ['watchedEpisodeCounts', id],
+      })
+    },
+  })
+
+  const markSeasonWatchedMutation = useMutation({
+    mutationFn: async () => {
+      return await markSeasonWatched({
+        data: {
+          tvShowId: id,
+          seasonId: tvSeason.id,
+          seasonNumber: tvSeason.season_number,
+        },
+      })
+    },
+
+    onSuccess: (data) => {
+      queryClient.setQueryData(watchedEpisodesQueryKey, data)
+      void queryClient.invalidateQueries({
+        queryKey: ['watchedEpisodeCounts', id],
+      })
+    },
   })
 
   const watchedEpisodeIds = new Set(watchedEpisodesQuery.data.episodeIds)
+  const watchedEpisodeCount = tvSeason.episodes.filter(episode => watchedEpisodeIds.has(episode.id)).length
+  const allEpisodesWatched = tvSeason.episodes.length > 0 && watchedEpisodeCount === tvSeason.episodes.length
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref={`/tv-show/${id}`} />
+          </IonButtons>
+
           <IonTitle>
             {tvShow.name}
             {' '}
@@ -77,6 +107,14 @@ function RouteComponent() {
           </IonTitle>
         </IonToolbar>
       </IonHeader>
+
+      <IonLoading
+        isOpen={toggleEpisodeMutation.isPending || markSeasonWatchedMutation.isPending}
+        message={markSeasonWatchedMutation.isPending
+          ? 'Marking season as watched…'
+          : 'Saving episode…'}
+      />
+
       <IonContent>
 
         {!watchedEpisodesQuery.data.signedIn && (
@@ -94,8 +132,39 @@ function RouteComponent() {
           </div>
         )}
 
-        {toggleEpisodeMutation.isError && (
-          <p role="alert">Could not save this episode. Please try again.</p>
+        {(toggleEpisodeMutation.isError || markSeasonWatchedMutation.isError) && (
+          <p role="alert">Could not save your watch history. Please try again.</p>
+        )}
+
+        {watchedEpisodesQuery.data.signedIn && (
+          <IonItem lines="full">
+            <IonLabel>
+              <h2>Season progress</h2>
+              <p>
+                {watchedEpisodeCount}
+                {' '}
+                of
+                {' '}
+                {tvSeason.episodes.length}
+                {' '}
+                episodes watched
+              </p>
+            </IonLabel>
+
+            <IonButton
+              slot="end"
+              type="button"
+              color={allEpisodesWatched ? 'success' : 'primary'}
+              fill={allEpisodesWatched ? 'solid' : 'outline'}
+              onClick={() => markSeasonWatchedMutation.mutate()}
+            >
+              {markSeasonWatchedMutation.isPending
+                ? 'Saving…'
+                : allEpisodesWatched
+                  ? 'All watched'
+                  : 'Mark all watched'}
+            </IonButton>
+          </IonItem>
         )}
 
         <IonList>
@@ -104,7 +173,6 @@ function RouteComponent() {
               <IonToggle
                 checked={watchedEpisodeIds.has(episode.id)}
                 onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
-                disabled={!watchedEpisodesQuery.data.signedIn || toggleEpisodeMutation.isPending}
               >
 
                 <IonLabel>

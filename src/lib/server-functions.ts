@@ -49,6 +49,28 @@ export const getWatchedEpisodes = createServerFn()
     return { signedIn: true, episodeIds }
   })
 
+export const getWatchedEpisodeCounts = createServerFn()
+  .validator(v.object({ tvShowId: v.number() }))
+  .handler(async ({ data: { tvShowId } }) => {
+    const historyStore = await getWatchHistoryStore()
+
+    if (!historyStore)
+      return { signedIn: false, countsBySeasonId: {} as Record<string, number> }
+
+    const watchHistory = await readWatchHistory(historyStore)
+    const countsBySeasonId: Record<string, number> = {}
+
+    for (const episode of watchHistory.watchedEpisodes) {
+      if (episode.tvShowId !== tvShowId)
+        continue
+
+      const seasonId = String(episode.seasonId)
+      countsBySeasonId[seasonId] = (countsBySeasonId[seasonId] ?? 0) + 1
+    }
+
+    return { signedIn: true, countsBySeasonId }
+  })
+
 export const getWatchedTvShows = createServerFn()
   .handler(async () => {
     const historyStore = await getWatchHistoryStore()
@@ -65,6 +87,47 @@ export const getWatchedTvShows = createServerFn()
     )
 
     return { signedIn: true, tvShows }
+  })
+
+export const markSeasonWatched = createServerFn({ method: 'POST' })
+  .validator(v.object({
+    tvShowId: v.number(),
+    seasonId: v.number(),
+    seasonNumber: v.number(),
+  }))
+  .handler(async ({ data }) => {
+    const historyStore = await getWatchHistoryStore()
+
+    if (!historyStore) {
+      throw new Error('You must be signed in to save watched episodes.')
+    }
+
+    const season = await tmdb.tvSeasons.details({
+      tvShowID: data.tvShowId,
+      seasonNumber: data.seasonNumber,
+    })
+
+    if (season.id !== data.seasonId) {
+      throw new Error('The requested season could not be verified.')
+    }
+
+    const watchHistory = await readWatchHistory(historyStore)
+    const otherEpisodes = watchHistory.watchedEpisodes.filter(episode =>
+      episode.tvShowId !== data.tvShowId || episode.seasonId !== data.seasonId,
+    )
+    const watchedEpisodes = season.episodes.map(episode => ({
+      tvShowId: data.tvShowId,
+      seasonId: data.seasonId,
+      episodeId: episode.id,
+    }))
+
+    watchHistory.watchedEpisodes = [...otherEpisodes, ...watchedEpisodes]
+    await historyStore.write(watchHistory)
+
+    return {
+      signedIn: true,
+      episodeIds: watchedEpisodes.map(episode => episode.episodeId),
+    }
   })
 
 export const toggleWatchedEpisode = createServerFn({ method: 'POST' })
