@@ -111,10 +111,6 @@ function RouteComponent() {
           </IonButtons>
 
           <IonTitle>
-            {tvShow.name}
-            {' '}
-            -
-            {' '}
             {tvSeason.season_number === 0
               ? tvSeason.name
               : `Season ${tvSeason.season_number}`}
