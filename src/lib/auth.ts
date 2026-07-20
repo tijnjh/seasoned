@@ -4,6 +4,7 @@ import process from 'node:process'
 import { betterAuth } from 'better-auth'
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET,
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
