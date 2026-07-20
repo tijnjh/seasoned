@@ -1,7 +1,4 @@
-@import 'tailwindcss';
-@import 'tailwind-color-pairings';
+@layer theme, components, utilities;
 
-html,
-body {
-  @apply bg-zinc-100-900 text-zinc-950-50;
-}
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);

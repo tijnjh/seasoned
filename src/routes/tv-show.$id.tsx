@@ -1,4 +1,5 @@
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
+import { IonContent, IonHeader, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
+import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
 import { getTvShow } from '#lib/server-functions'
 
 export const Route = createFileRoute('/tv-show/$id')({
@@ -7,40 +8,49 @@ export const Route = createFileRoute('/tv-show/$id')({
     stringify: ({ id }) => ({ id: String(id) }),
   },
 
+  ssr: 'data-only',
+
   loader: async ({ params }) => {
-    const tvShowDetails = await getTvShow({ data: { id: params.id } })
-    return { tvShowDetails }
+    const tvShow = await getTvShow({ data: { id: params.id } })
+    return { tvShow }
   },
 
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { tvShowDetails } = Route.useLoaderData()
+  const { tvShow } = Route.useLoaderData()
   const { id } = Route.useParams()
+  const router = useRouter()
 
   return (
-    <div>
-      {/* <h1>{tvShowDetails.name}</h1> */}
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>{tvShow.name}</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
 
-      <nav className="flex flex-wrap gap-2">
-        {tvShowDetails.seasons.map(season => (
-          <Link
-            key={season.id}
-            to="/tv-show/$id/$season"
-            className="shrink-0"
-            activeProps={{ className: 'bg-blue-400' }}
-            params={{
-              id,
-              season: season.season_number,
-            }}
-          >
-            {season.season_number || season.name}
-          </Link>
-        ))}
-      </nav>
+        <IonList>
+          {tvShow.seasons.map(season => (
+            <IonItem
+              key={season.id}
+              routerLink={router.buildLocation({
+                to: '/tv-show/$id/$season',
+                params: {
+                  id,
+                  season: season.season_number,
+                },
+              }).href}
+            >
+              {season.season_number || season.name}
+            </IonItem>
+          ))}
+        </IonList>
 
-      <Outlet />
-    </div>
+        <Outlet />
+      </IonContent>
+    </IonPage>
   )
 }

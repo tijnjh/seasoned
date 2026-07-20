@@ -1,5 +1,5 @@
+import { IonButton } from '@ionic/react'
 import { authClient } from '#lib/auth-client'
-import { Button } from './button'
 
 export function AuthButton() {
   const { data: session, isPending } = authClient.useSession()
@@ -9,7 +9,7 @@ export function AuthButton() {
 
   if (!session) {
     return (
-      <Button
+      <IonButton
         type="button"
         onClick={() =>
           authClient.signIn.social({
@@ -18,7 +18,7 @@ export function AuthButton() {
           })}
       >
         Continue with Google
-      </Button>
+      </IonButton>
     )
   }
 
@@ -26,12 +26,12 @@ export function AuthButton() {
     <div className="flex items-center gap-4">
       <span>{session.user.name}</span>
 
-      <Button
+      <IonButton
         type="button"
         onClick={() => authClient.signOut()}
       >
         Sign out
-      </Button>
+      </IonButton>
     </div>
   )
 }

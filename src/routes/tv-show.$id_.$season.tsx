@@ -1,0 +1,125 @@
+import { IonButton, IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute } from '@tanstack/react-router'
+import { authClient } from '#lib/auth-client'
+import { getTvSeason, getTvShow, getWatchedEpisodes, toggleWatchedEpisode } from '#lib/server-functions'
+
+export const Route = createFileRoute('/tv-show/$id_/$season')({
+  params: {
+    parse: ({ id, season }) => ({ id: Number(id), season: Number(season) }),
+    stringify: ({ id, season }) => ({ id: String(id), season: String(season) }),
+  },
+
+  ssr: 'data-only',
+
+  loader: async ({ params }) => {
+    const tvShow = await getTvShow({ data: { id: params.id } })
+
+    const tvSeason = await getTvSeason({
+      data: {
+        tvShowID: params.id,
+        seasonNumber: params.season,
+      },
+    })
+
+    const watchedEpisodes = await getWatchedEpisodes({
+      data: {
+        tvShowId: params.id,
+        seasonId: tvSeason.id,
+      },
+    })
+
+    return { tvShow, tvSeason, watchedEpisodes }
+  },
+
+  component: RouteComponent,
+})
+
+function RouteComponent() {
+  const { tvShow, tvSeason, watchedEpisodes } = Route.useLoaderData()
+
+  const { id, season } = Route.useParams()
+
+  const queryClient = useQueryClient()
+
+  const watchedEpisodesQueryKey = ['watchedEpisodes', id, tvSeason.id] as const
+
+  const watchedEpisodesQuery = useQuery({
+    queryKey: watchedEpisodesQueryKey,
+    queryFn: () => getWatchedEpisodes({
+      data: { tvShowId: id, seasonId: tvSeason.id },
+    }),
+    initialData: watchedEpisodes,
+    staleTime: Infinity,
+  })
+
+  const toggleEpisodeMutation = useMutation({
+    mutationFn: async (episodeId: number) => {
+      return await toggleWatchedEpisode({
+        data: { tvShowId: id, seasonId: tvSeason.id, episodeId },
+      })
+    },
+
+    onSuccess: data => queryClient.setQueryData(watchedEpisodesQueryKey, data),
+  })
+
+  const watchedEpisodeIds = new Set(watchedEpisodesQuery.data.episodeIds)
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>
+            {tvShow.name}
+            {' '}
+            - season
+            {tvSeason.season_number || tvSeason.name}
+          </IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
+
+        {!watchedEpisodesQuery.data.signedIn && (
+          <div className="flex items-center justify-between gap-4">
+            <p>Sign in to track watched episodes.</p>
+            <IonButton
+              type="button"
+              onClick={() => authClient.signIn.social({
+                provider: 'google',
+                callbackURL: `/tv-show/${id}/${season}`,
+              })}
+            >
+              Continue with Google
+            </IonButton>
+          </div>
+        )}
+
+        {toggleEpisodeMutation.isError && (
+          <p role="alert">Could not save this episode. Please try again.</p>
+        )}
+
+        <IonList>
+          {tvSeason.episodes.map(episode => (
+            <IonItem key={episode.id} className="flex gap-3">
+              <IonToggle
+                checked={watchedEpisodeIds.has(episode.id)}
+                onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
+                disabled={!watchedEpisodesQuery.data.signedIn || toggleEpisodeMutation.isPending}
+              >
+
+                <IonLabel>
+                  {`${episode.episode_number}. ${episode.name}`}
+                </IonLabel>
+
+                <IonLabel color="medium">
+                  {episode.overview}
+                </IonLabel>
+
+              </IonToggle>
+            </IonItem>
+          ))}
+        </IonList>
+      </IonContent>
+    </IonPage>
+  )
+}

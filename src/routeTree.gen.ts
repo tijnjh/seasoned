@@ -13,7 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as TvShowIdRouteImport } from './routes/tv-show.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
-import { Route as TvShowIdSeasonRouteImport } from './routes/tv-show.$id.$season'
+import { Route as TvShowIdSeasonRouteImport } from './routes/tv-show.$id_.$season'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,22 +36,22 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const TvShowIdSeasonRoute = TvShowIdSeasonRouteImport.update({
-  id: '/$season',
-  path: '/$season',
-  getParentRoute: () => TvShowIdRoute,
+  id: '/tv-show/$id_/$season',
+  path: '/tv-show/$id/$season',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
-  '/tv-show/$id': typeof TvShowIdRouteWithChildren
+  '/tv-show/$id': typeof TvShowIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/tv-show/$id/$season': typeof TvShowIdSeasonRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
-  '/tv-show/$id': typeof TvShowIdRouteWithChildren
+  '/tv-show/$id': typeof TvShowIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/tv-show/$id/$season': typeof TvShowIdSeasonRoute
 }
@@ -59,9 +59,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
-  '/tv-show/$id': typeof TvShowIdRouteWithChildren
+  '/tv-show/$id': typeof TvShowIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/tv-show/$id/$season': typeof TvShowIdSeasonRoute
+  '/tv-show/$id_/$season': typeof TvShowIdSeasonRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -75,14 +75,15 @@ export interface FileRouteTypes {
     | '/search'
     | '/tv-show/$id'
     | '/api/auth/$'
-    | '/tv-show/$id/$season'
+    | '/tv-show/$id_/$season'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SearchRoute: typeof SearchRoute
-  TvShowIdRoute: typeof TvShowIdRouteWithChildren
+  TvShowIdRoute: typeof TvShowIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  TvShowIdSeasonRoute: typeof TvShowIdSeasonRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -115,33 +116,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tv-show/$id/$season': {
-      id: '/tv-show/$id/$season'
-      path: '/$season'
+    '/tv-show/$id_/$season': {
+      id: '/tv-show/$id_/$season'
+      path: '/tv-show/$id/$season'
       fullPath: '/tv-show/$id/$season'
       preLoaderRoute: typeof TvShowIdSeasonRouteImport
-      parentRoute: typeof TvShowIdRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface TvShowIdRouteChildren {
-  TvShowIdSeasonRoute: typeof TvShowIdSeasonRoute
-}
-
-const TvShowIdRouteChildren: TvShowIdRouteChildren = {
-  TvShowIdSeasonRoute: TvShowIdSeasonRoute,
-}
-
-const TvShowIdRouteWithChildren = TvShowIdRoute._addFileChildren(
-  TvShowIdRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SearchRoute: SearchRoute,
-  TvShowIdRoute: TvShowIdRouteWithChildren,
+  TvShowIdRoute: TvShowIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  TvShowIdSeasonRoute: TvShowIdSeasonRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

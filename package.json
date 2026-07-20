@@ -15,12 +15,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@base-ui/react": "^1.6.0",
     "@googleapis/drive": "^20.2.0",
+    "@ionic/core": "^8.8.14",
+    "@ionic/react": "^8.8.14",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-start": "^1.168.30",
     "better-auth": "^1.6.23",
     "cnfast": "^0.0.8",
+    "ionicons": "^8.0.13",
     "nitro": "3.0.260610-beta",
     "react": "latest",
     "react-dom": "latest",

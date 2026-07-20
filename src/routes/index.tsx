@@ -1,25 +1,29 @@
-import { Form } from '@base-ui/react'
+import { IonContent, IonHeader, IonPage, IonSearchbar } from '@ionic/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
-import { Input } from '#components/input'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
+  ssr: 'data-only',
 })
 
 function RouteComponent() {
-  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-
   const navigate = Route.useNavigate()
 
-  return (
-    <>
-      <AuthButton />
+  const [query, setQuery] = useState<string | undefined>(undefined)
 
-      <Form
-        onFormSubmit={() => {
-          const q = searchQuery?.trim()
+  return (
+    <IonPage>
+      <IonHeader>
+        <AuthButton />
+      </IonHeader>
+
+      <IonContent>
+        <form onSubmit={(e) => {
+          e.preventDefault()
+
+          const q = query?.trim()
 
           if (!q)
             return
@@ -29,13 +33,13 @@ function RouteComponent() {
             search: { q },
           })
         }}
-      >
-        <Input
-          value={searchQuery}
-          onValueChange={setSearchQuery}
-          placeholder="search"
-        />
-      </Form>
-    </>
+        >
+          <IonSearchbar
+            onIonInput={e => setQuery(e.detail.value ?? undefined)}
+            value={query}
+          />
+        </form>
+      </IonContent>
+    </IonPage>
   )
 }
