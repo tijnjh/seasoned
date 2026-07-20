@@ -3,8 +3,11 @@ import { useCanGoBack, useRouter } from '@tanstack/react-router'
 import { chevronBack } from 'ionicons/icons'
 
 type RouterBackButtonProps
-  = | { fallbackTo: '/' }
-    | { fallbackTo: '/tv-show/$id', params: { id: number } }
+  = { label: string }
+    & (
+      | { fallbackTo: '/' }
+      | { fallbackTo: '/tv-show/$id', params: { id: number } }
+    )
 
 export function RouterBackButton(props: RouterBackButtonProps) {
   const canGoBack = useCanGoBack()
@@ -31,11 +34,11 @@ export function RouterBackButton(props: RouterBackButtonProps) {
     <IonButton
       type="button"
       fill="clear"
-      aria-label="Back"
+      aria-label={`Back to ${props.label}`}
       onClick={goBack}
     >
       <IonIcon slot="start" icon={chevronBack} aria-hidden="true" />
-      Back
+      {props.label}
     </IonButton>
   )
 }

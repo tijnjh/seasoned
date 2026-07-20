@@ -41,7 +41,7 @@ function RouteComponent() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <RouterBackButton fallbackTo="/" />
+            <RouterBackButton fallbackTo="/" label="Episcoped" />
           </IonButtons>
 
           <IonTitle>{tvShow.name}</IonTitle>

@@ -75,10 +75,23 @@ export const getWatchedTvShows = createServerFn()
   .handler(async () => {
     const historyStore = await getWatchHistoryStore()
 
-    if (!historyStore)
-      return { signedIn: false, tvShows: [] }
+    if (!historyStore) {
+      return {
+        signedIn: false,
+        tvShows: [],
+        watchedEpisodeCountsByTvShowId: {} as Record<string, number>,
+      }
+    }
 
     const watchHistory = await readWatchHistory(historyStore)
+    const watchedEpisodeCountsByTvShowId: Record<string, number> = {}
+
+    for (const episode of watchHistory.watchedEpisodes) {
+      const tvShowId = String(episode.tvShowId)
+      watchedEpisodeCountsByTvShowId[tvShowId]
+        = (watchedEpisodeCountsByTvShowId[tvShowId] ?? 0) + 1
+    }
+
     const tvShowIds = new Set(
       watchHistory.watchedEpisodes.map(episode => episode.tvShowId),
     )
@@ -86,7 +99,7 @@ export const getWatchedTvShows = createServerFn()
       [...tvShowIds].map(id => tmdb.tvShows.details(id)),
     )
 
-    return { signedIn: true, tvShows }
+    return { signedIn: true, tvShows, watchedEpisodeCountsByTvShowId }
   })
 
 export const markSeasonWatched = createServerFn({ method: 'POST' })

@@ -100,6 +100,7 @@ function RouteComponent() {
             <RouterBackButton
               fallbackTo="/tv-show/$id"
               params={{ id }}
+              label={tvShow.name}
             />
           </IonButtons>
 

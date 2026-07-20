@@ -1,4 +1,4 @@
-import { IonAvatar, IonButtons, IonContent, IonHeader, IonList, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react'
+import { IonAvatar, IonBadge, IonButtons, IonContent, IonHeader, IonList, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
@@ -23,6 +23,9 @@ function RouteComponent() {
   const [query, setQuery] = useState<string | undefined>(undefined)
 
   const { watchedTvShows } = Route.useLoaderData()
+  const sortedTvShows = [...watchedTvShows.tvShows].sort((first, second) =>
+    first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }),
+  )
 
   return (
     <IonPage>
@@ -31,10 +34,20 @@ function RouteComponent() {
           <IonButtons slot="end">
             <AuthButton />
           </IonButtons>
+          <IonTitle>Episcoped</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent>
+
+        <IonHeader collapse="condense">
+          <IonToolbar>
+            <IonTitle size="large">
+              Frontpage
+            </IonTitle>
+          </IonToolbar>
+        </IonHeader>
+
         <form onSubmit={(e) => {
           e.preventDefault()
 
@@ -56,21 +69,41 @@ function RouteComponent() {
         </form>
 
         <IonList>
-          {watchedTvShows.tvShows.map(tvShow => (
-            <RouterItem
-              to="/tv-show/$id"
-              params={{ id: tvShow.id }}
-              key={tvShow.id}
-            >
-              {tvShow.poster_path && (
-                <IonAvatar slot="start">
-                  <img src={getSrcFromPath(tvShow.poster_path)} />
-                </IonAvatar>
-              )}
+          {sortedTvShows.map((tvShow) => {
+            const watchedEpisodeCount
+              = watchedTvShows.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
+            const totalEpisodeCount = tvShow.seasons.reduce(
+              (total, season) => total + season.episode_count,
+              0,
+            )
+            const allWatched = totalEpisodeCount > 0
+              && watchedEpisodeCount >= totalEpisodeCount
 
-              {tvShow.name}
-            </RouterItem>
-          ))}
+            return (
+              <RouterItem
+                to="/tv-show/$id"
+                params={{ id: tvShow.id }}
+                key={tvShow.id}
+              >
+                {tvShow.poster_path && (
+                  <IonAvatar slot="start">
+                    <img src={getSrcFromPath(tvShow.poster_path)} />
+                  </IonAvatar>
+                )}
+
+                {tvShow.name}
+
+                <IonBadge
+                  slot="end"
+                  color={allWatched ? 'success' : 'medium'}
+                >
+                  {watchedEpisodeCount}
+                  /
+                  {totalEpisodeCount}
+                </IonBadge>
+              </RouterItem>
+            )
+          })}
         </IonList>
       </IonContent>
 
