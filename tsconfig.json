@@ -7,12 +7,8 @@
     "module": "ESNext",
     "rewriteRelativeImportExtensions": true,
     "moduleResolution": "bundler",
-    "paths": {
-      "$lib/*": ["./src/lib/*"]
-    },
     "resolveJsonModule": true,
-    "resolvePackageJsonImports": true,
-    "types": ["vite/client", "node"],
+    "types": ["vite/client"],
     "allowJs": true,
     "checkJs": true,
     "strict": true,
@@ -22,5 +18,5 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["src", "vite.config.ts", "eslint.config.js"]
+  "include": ["src", "vite.config.ts", "eslint.config.js", "server"]
 }

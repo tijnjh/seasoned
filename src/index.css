@@ -1,0 +1,104 @@
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+:root {
+  --light-base: rgb(255, 255, 255);
+  --light-text: rgb(0, 0, 0);
+
+  --light-gray-1: rgb(142, 142, 147);
+  --light-gray-2: rgb(174, 174, 178);
+  --light-gray-3: rgb(199, 199, 204);
+  --light-gray-4: rgb(209, 209, 214);
+  --light-gray-5: rgb(229, 229, 234);
+  --light-gray-6: rgb(242, 242, 247);
+  --light-gray-7: rgb(247, 247, 247);
+
+  --light-blue: rgb(0, 122, 255);
+  --light-green: rgb(52, 199, 89);
+  --light-indigo: rgb(88, 86, 214);
+  --light-orange: rgb(255, 149, 0);
+  --light-pink: rgb(255, 45, 85);
+  --light-purple: rgb(175, 82, 222);
+  --light-red: rgb(255, 59, 48);
+  --light-teal: rgb(90, 200, 250);
+  --light-yellow: rgb(255, 204, 0);
+
+  /*  */
+
+  --dark-base: rgb(0, 0, 0);
+  --dark-text: rgb(255, 255, 255);
+
+  --dark-gray-1: rgb(142, 142, 147);
+  --dark-gray-2: rgb(99, 99, 102);
+  --dark-gray-3: rgb(72, 72, 74);
+  --dark-gray-4: rgb(58, 58, 60);
+  --dark-gray-5: rgb(44, 44, 46);
+  --dark-gray-6: rgb(28, 28, 30);
+  --dark-gray-7: rgb(13, 13, 13);
+
+  --dark-blue: rgb(10, 132, 255);
+  --dark-green: rgb(48, 209, 88);
+  --dark-indigo: rgb(94, 92, 230);
+  --dark-orange: rgb(255, 159, 10);
+  --dark-pink: rgb(255, 55, 95);
+  --dark-purple: rgb(191, 90, 242);
+  --dark-red: rgb(255, 69, 58);
+  --dark-teal: rgb(100, 210, 255);
+  --dark-yellow: rgb(255, 214, 10);
+}
+
+:root {
+  --base: var(--light-base);
+  --text: var(--light-text);
+
+  --gray-1: var(--light-gray-1);
+  --gray-2: var(--light-gray-2);
+  --gray-3: var(--light-gray-3);
+  --gray-4: var(--light-gray-4);
+  --gray-5: var(--light-gray-5);
+  --gray-6: var(--light-gray-6);
+  --gray-7: var(--light-gray-7);
+
+  --blue: var(--light-blue);
+  --green: var(--light-green);
+  --indigo: var(--light-indigo);
+  --orange: var(--light-orange);
+  --pink: var(--light-pink);
+  --purple: var(--light-purple);
+  --red: var(--light-red);
+  --teal: var(--light-teal);
+  --yellow: var(--light-yellow);
+
+  --background: var(--light-gray-6);
+  --elevated: var(--light-base);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --base: var(--dark-base);
+    --text: var(--dark-text);
+
+    --gray-1: var(--dark-gray-1);
+    --gray-2: var(--dark-gray-2);
+    --gray-3: var(--dark-gray-3);
+    --gray-4: var(--dark-gray-4);
+    --gray-5: var(--dark-gray-5);
+    --gray-6: var(--dark-gray-6);
+    --gray-7: var(--dark-gray-7);
+
+    --blue: var(--dark-blue);
+    --green: var(--dark-green);
+    --indigo: var(--dark-indigo);
+    --orange: var(--dark-orange);
+    --pink: var(--dark-pink);
+    --purple: var(--dark-purple);
+    --red: var(--dark-red);
+    --teal: var(--dark-teal);
+    --yellow: var(--dark-yellow);
+
+    --background: var(--dark-base);
+    --elevated: var(--dark-gray-6);
+  }
+}

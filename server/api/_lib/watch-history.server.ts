@@ -1,13 +1,7 @@
 import type { AppDataStore } from './google-drive-app-data'
 import { drive, auth as googleAuth } from '@googleapis/drive'
-import {
-  getRequestHeaders,
-  setResponseHeader,
-} from '@tanstack/react-start/server'
-import { auth } from './auth'
-import {
-  createGoogleDriveAppDataStore,
-} from './google-drive-app-data'
+import { auth } from '../../../src/lib/auth'
+import { createGoogleDriveAppDataStore } from './google-drive-app-data'
 
 interface WatchedEpisode {
   tvShowId: number
@@ -20,8 +14,11 @@ interface WatchHistory {
 }
 
 export async function getWatchHistoryStore() {
-  const headers = getRequestHeaders()
-  const session = await auth.api.getSession({ headers })
+  // const headers = getRequestHeaders()
+  const session = await auth.api.getSession({
+    headers: {},
+    // headers
+  })
 
   if (!session) {
     return
@@ -29,14 +26,14 @@ export async function getWatchHistoryStore() {
 
   const tokenResult = await auth.api.getAccessToken({
     body: { providerId: 'google' },
-    headers,
+    // headers,
     returnHeaders: true,
   })
 
   const setCookieHeaders = tokenResult.headers.getSetCookie()
 
   if (setCookieHeaders.length > 0) {
-    setResponseHeader('set-cookie', setCookieHeaders)
+    // setResponseHeader('set-cookie', setCookieHeaders)
   }
 
   const oauth2Client = new googleAuth.OAuth2()

@@ -1,29 +1,23 @@
-import { IonAvatar, IonBadge, IonButtons, IonContent, IonHeader, IonList, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { IonAvatar, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react'
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useHistory } from 'react-router'
 import { AuthButton } from '#components/auth-button'
-import { RouterItem } from '#components/router-item'
-import { getWatchedTvShows } from '#lib/server-functions'
+
+import { getWatchedTvShows } from '#lib/api'
 import { getSrcFromPath } from '#lib/utils'
 
-export const Route = createFileRoute('/')({
-  component: RouteComponent,
+export function HomePage() {
+  const history = useHistory()
 
-  ssr: 'data-only',
-
-  loader: async () => {
-    const watchedTvShows = await getWatchedTvShows()
-    return { watchedTvShows }
-  },
-})
-
-function RouteComponent() {
-  const navigate = Route.useNavigate()
+  const { data: watchedTvShows } = useQuery({
+    queryKey: ['watched-tv-shows'],
+    queryFn: async () => getWatchedTvShows(),
+  })
 
   const [query, setQuery] = useState<string | undefined>(undefined)
 
-  const { watchedTvShows } = Route.useLoaderData()
-  const sortedTvShows = [...watchedTvShows.tvShows].sort((first, second) =>
+  const sortedTvShows = [...(watchedTvShows?.tvShows ?? [])].sort((first, second) =>
     first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }),
   )
 
@@ -56,9 +50,9 @@ function RouteComponent() {
           if (!q)
             return
 
-          navigate({
-            to: '/search',
-            search: { q },
+          history.push({
+            pathname: '/search',
+            search: `?q=${encodeURIComponent(q)}`,
           })
         }}
         >
@@ -70,8 +64,7 @@ function RouteComponent() {
 
         <IonList>
           {sortedTvShows.map((tvShow) => {
-            const watchedEpisodeCount
-              = watchedTvShows.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
+            const watchedEpisodeCount = watchedTvShows?.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
             const totalEpisodeCount = tvShow.seasons.reduce(
               (total, season) => total + (season.season_number === 0 ? 0 : season.episode_count),
               0,
@@ -83,10 +76,9 @@ function RouteComponent() {
               : watchedEpisodeCount > 0 ? 'warning' : 'medium'
 
             return (
-              <RouterItem
-                to="/tv-show/$id"
-                params={{ id: tvShow.id }}
+              <IonItem
                 key={tvShow.id}
+                routerLink={`/tv-show/${tvShow.id}`}
               >
                 {tvShow.poster_path && (
                   <IonAvatar slot="start">
@@ -105,7 +97,7 @@ function RouteComponent() {
                   /
                   {totalEpisodeCount}
                 </IonBadge>
-              </RouterItem>
+              </IonItem>
             )
           })}
         </IonList>
