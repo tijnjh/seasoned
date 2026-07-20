@@ -1,5 +1,5 @@
-import { IonContent, IonHeader, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
-import { createFileRoute, createLink, Outlet } from '@tanstack/react-router'
+import { IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { RouterItem } from '#components/router-item'
 import { getTvShow } from '#lib/server-functions'
 
