@@ -1,21 +1,16 @@
 import { IonAvatar, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSearchbar, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { useHistory } from 'react-router'
 import { AuthButton } from '#components/auth-button'
 
+import { Searchbar } from '#components/searchbar'
 import { getWatchedTvShows } from '#lib/api'
 import { getSrcFromPath } from '#lib/utils'
 
 export function HomePage() {
-  const history = useHistory()
-
   const { data: watchedTvShows, isLoading } = useQuery({
     queryKey: ['watched-tv-shows'],
     queryFn: async () => getWatchedTvShows(),
   })
-
-  const [query, setQuery] = useState<string | undefined>(undefined)
 
   const sortedTvShows = [...(watchedTvShows?.tvShows ?? [])].sort((first, second) =>
     first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }),
@@ -42,25 +37,7 @@ export function HomePage() {
           </IonToolbar>
         </IonHeader>
 
-        <form onSubmit={(e) => {
-          e.preventDefault()
-
-          const q = query?.trim()
-
-          if (!q)
-            return
-
-          history.push({
-            pathname: '/search',
-            search: `?q=${encodeURIComponent(q)}`,
-          })
-        }}
-        >
-          <IonSearchbar
-            onIonInput={e => setQuery(e.detail.value ?? undefined)}
-            value={query}
-          />
-        </form>
+        <Searchbar />
 
         {isLoading && <IonSpinner className="my-8 w-full" />}
 
