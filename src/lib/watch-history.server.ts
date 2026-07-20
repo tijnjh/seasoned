@@ -1,4 +1,4 @@
-import type { TrackerData, TrackerStorage } from './tracker-storage'
+import type { AppDataStore } from './google-drive-app-data'
 import { drive, auth as googleAuth } from '@googleapis/drive'
 import {
   getRequestHeaders,
@@ -6,10 +6,20 @@ import {
 } from '@tanstack/react-start/server'
 import { auth } from './auth'
 import {
-  createGoogleDriveStorage,
-} from './tracker-storage'
+  createGoogleDriveAppDataStore,
+} from './google-drive-app-data'
 
-export async function getTrackerStorage() {
+interface WatchedEpisode {
+  tvShowId: number
+  seasonId: number
+  episodeId: number
+}
+
+interface WatchHistory {
+  watchedEpisodes: WatchedEpisode[]
+}
+
+export async function getWatchHistoryStore() {
   const headers = getRequestHeaders()
   const session = await auth.api.getSession({ headers })
 
@@ -40,15 +50,17 @@ export async function getTrackerStorage() {
     auth: oauth2Client,
   })
 
-  return createGoogleDriveStorage<TrackerData>(googleDrive)
+  return createGoogleDriveAppDataStore<WatchHistory>(googleDrive)
 }
 
-export async function readTracker(
-  storage: TrackerStorage<TrackerData>,
-): Promise<TrackerData> {
-  const tracker = await storage.read()
+export async function readWatchHistory(
+  store: AppDataStore<WatchHistory>,
+): Promise<WatchHistory> {
+  const storedHistory = await store.read()
 
   return {
-    watchedEpisodes: Array.isArray(tracker?.watchedEpisodes) ? tracker.watchedEpisodes : [],
+    watchedEpisodes: Array.isArray(storedHistory?.watchedEpisodes)
+      ? storedHistory.watchedEpisodes
+      : [],
   }
 }

@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
 import { tmdb } from './tmdb'
-import { getTrackerStorage, readTracker } from './tracker.server'
+import { getWatchHistoryStore, readWatchHistory } from './watch-history.server'
 
 export const search = createServerFn()
   .validator(v.string())
@@ -34,13 +34,13 @@ export const getWatchedEpisodes = createServerFn()
     }),
   )
   .handler(async ({ data: { tvShowId, seasonId } }) => {
-    const storage = await getTrackerStorage()
+    const historyStore = await getWatchHistoryStore()
 
-    if (!storage)
+    if (!historyStore)
       return { signedIn: false, episodeIds: [] }
 
-    const tracker = await readTracker(storage)
-    const episodeIds = tracker.watchedEpisodes
+    const watchHistory = await readWatchHistory(historyStore)
+    const episodeIds = watchHistory.watchedEpisodes
       .filter(episode =>
         episode.tvShowId === tvShowId && episode.seasonId === seasonId,
       )
@@ -56,13 +56,13 @@ export const toggleWatchedEpisode = createServerFn({ method: 'POST' })
     episodeId: v.number(),
   }))
   .handler(async ({ data }) => {
-    const storage = await getTrackerStorage()
+    const historyStore = await getWatchHistoryStore()
 
-    if (!storage) {
-      throw new Error('You must be signed in to track watched episodes.')
+    if (!historyStore) {
+      throw new Error('You must be signed in to save watched episodes.')
     }
-    const tracker = await readTracker(storage)
-    const existingIndex = tracker.watchedEpisodes.findIndex(episode =>
+    const watchHistory = await readWatchHistory(historyStore)
+    const existingIndex = watchHistory.watchedEpisodes.findIndex(episode =>
       episode.tvShowId === data.tvShowId
       && episode.seasonId === data.seasonId
       && episode.episodeId === data.episodeId,
@@ -70,13 +70,13 @@ export const toggleWatchedEpisode = createServerFn({ method: 'POST' })
     const watched = existingIndex === -1
 
     if (watched)
-      tracker.watchedEpisodes.push(data)
+      watchHistory.watchedEpisodes.push(data)
     else
-      tracker.watchedEpisodes.splice(existingIndex, 1)
+      watchHistory.watchedEpisodes.splice(existingIndex, 1)
 
-    await storage.write(tracker)
+    await historyStore.write(watchHistory)
 
-    const episodeIds = tracker.watchedEpisodes
+    const episodeIds = watchHistory.watchedEpisodes
       .filter(episode =>
         episode.tvShowId === data.tvShowId
         && episode.seasonId === data.seasonId,
