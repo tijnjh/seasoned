@@ -1,4 +1,5 @@
 import { authClient } from '#lib/auth-client'
+import { Button } from './button'
 
 export function AuthButton() {
   const { data: session, isPending } = authClient.useSession()
@@ -8,7 +9,7 @@ export function AuthButton() {
 
   if (!session) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() =>
           authClient.signIn.social({
@@ -17,20 +18,20 @@ export function AuthButton() {
           })}
       >
         Continue with Google
-      </button>
+      </Button>
     )
   }
 
   return (
-    <div>
+    <div className="flex items-center gap-4">
       <span>{session.user.name}</span>
 
-      <button
+      <Button
         type="button"
         onClick={() => authClient.signOut()}
       >
         Sign out
-      </button>
+      </Button>
     </div>
   )
 }
