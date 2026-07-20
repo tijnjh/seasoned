@@ -1,4 +1,5 @@
 import antfu from '@antfu/eslint-config'
+import pluginRouter from '@tanstack/eslint-plugin-router'
 import tailwindcss from 'eslint-plugin-better-tailwindcss'
 
 export default antfu({
@@ -17,4 +18,6 @@ export default antfu({
   rules: {
     'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
   },
-})
+}).append(
+  ...pluginRouter.configs['flat/recommended'],
+)

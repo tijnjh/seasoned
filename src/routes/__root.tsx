@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   createRootRoute,
   HeadContent,
@@ -22,6 +23,8 @@ export const Route = createRootRoute({
   component: RootComponent,
 })
 
+const queryClient = new QueryClient()
+
 function RootComponent() {
   return (
     <StrictMode>
@@ -30,9 +33,11 @@ function RootComponent() {
           <HeadContent />
         </head>
         <body>
-          <div className="mx-auto flex w-full max-w-xl flex-col gap-4 p-4">
-            <Outlet />
-          </div>
+          <QueryClientProvider client={queryClient}>
+            <div className="mx-auto flex w-full max-w-xl flex-col gap-4 p-4">
+              <Outlet />
+            </div>
+          </QueryClientProvider>
 
           <Scripts />
         </body>

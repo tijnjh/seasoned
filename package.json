@@ -17,6 +17,7 @@
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@googleapis/drive": "^20.2.0",
+    "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-start": "^1.168.30",
     "better-auth": "^1.6.23",
     "cnfast": "^0.0.8",
@@ -32,6 +33,7 @@
     "@antfu/eslint-config": "^9.1.0",
     "@eslint-react/eslint-plugin": "^5.17.1",
     "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/eslint-plugin-router": "^1.162.0",
     "@tanstack/react-router": "latest",
     "@types/node": "^26.1.1",
     "@types/react": "latest",

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as v from 'valibot'
 import { search } from '#lib/server-functions'
-import { getSrcFromPath } from '#lib/tmdb'
+import { getSrcFromPath } from '#lib/utils'
 
 export const Route = createFileRoute('/search')({
 
@@ -24,7 +24,7 @@ function RouteComponent() {
     <div>
       {result.results.map(r => (
         <Link key={r.id} to="/tv-show/$id" params={{ id: r.id }}>
-          <img src={getSrcFromPath(r.poster_path)} />
+          <img src={getSrcFromPath(r.poster_path)} className="size-7" />
           {r.name}
         </Link>
       ))}

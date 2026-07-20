@@ -4,6 +4,16 @@ import type { drive_v3 } from '@googleapis/drive'
 
 const FILE_NAME = 'tracker.json'
 
+export interface WatchedEpisode {
+  tvShowId: number
+  seasonId: number
+  episodeId: number
+}
+
+export interface TrackerData {
+  watchedEpisodes: WatchedEpisode[]
+}
+
 export interface TrackerStorage<T> {
   read: () => Promise<T | null>
   write: (value: T) => Promise<void>
