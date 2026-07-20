@@ -1,5 +1,5 @@
 import { IonAvatar, IonContent, IonItem, IonList, IonPage } from '@ionic/react'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute, createLink } from '@tanstack/react-router'
 import * as v from 'valibot'
 import { search } from '#lib/server-functions'
 import { getSrcFromPath } from '#lib/utils'
@@ -20,21 +20,19 @@ export const Route = createFileRoute('/search')({
   component: RouteComponent,
 })
 
+const RouterItem = createLink(IonItem)
+
 function RouteComponent() {
   const { results } = Route.useLoaderData()
-
-  const router = useRouter()
 
   return (
     <IonPage>
       <IonContent>
         <IonList>
           {results.map(result => (
-            <IonItem
-              routerLink={router.buildLocation({
-                to: '/tv-show/$id',
-                params: { id: result.id },
-              }).href}
+            <RouterItem
+              to="/tv-show/$id"
+              params={{ id: result.id }}
               key={result.id}
             >
               {result.poster_path && (
@@ -44,7 +42,7 @@ function RouteComponent() {
               )}
 
               {result.name}
-            </IonItem>
+            </RouterItem>
           ))}
         </IonList>
       </IonContent>

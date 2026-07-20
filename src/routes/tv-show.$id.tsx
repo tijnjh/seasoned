@@ -1,5 +1,6 @@
 import { IonContent, IonHeader, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
-import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
+import { createFileRoute, createLink, Outlet } from '@tanstack/react-router'
+import { RouterItem } from '#components/router-item'
 import { getTvShow } from '#lib/server-functions'
 
 export const Route = createFileRoute('/tv-show/$id')({
@@ -21,8 +22,6 @@ export const Route = createFileRoute('/tv-show/$id')({
 function RouteComponent() {
   const { tvShow } = Route.useLoaderData()
   const { id } = Route.useParams()
-  const router = useRouter()
-
   return (
     <IonPage>
       <IonHeader>
@@ -34,18 +33,13 @@ function RouteComponent() {
 
         <IonList>
           {tvShow.seasons.map(season => (
-            <IonItem
+            <RouterItem
               key={season.id}
-              routerLink={router.buildLocation({
-                to: '/tv-show/$id/$season',
-                params: {
-                  id,
-                  season: season.season_number,
-                },
-              }).href}
+              to="/tv-show/$id/$season"
+              params={{ id, season: season.season_number }}
             >
               {season.season_number || season.name}
-            </IonItem>
+            </RouterItem>
           ))}
         </IonList>
 

@@ -1,7 +1,8 @@
-import { IonAvatar, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonSearchbar, IonToolbar } from '@ionic/react'
-import { createFileRoute, useRouteContext, useRouter } from '@tanstack/react-router'
+import { IonAvatar, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSearchbar, IonToolbar } from '@ionic/react'
+import { createFileRoute, createLink } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
+import { RouterItem } from '#components/router-item'
 import { getWatchedTvShows } from '#lib/server-functions'
 import { getSrcFromPath } from '#lib/utils'
 
@@ -22,8 +23,6 @@ function RouteComponent() {
   const [query, setQuery] = useState<string | undefined>(undefined)
 
   const { watchedTvShows } = Route.useLoaderData()
-
-  const router = useRouter()
 
   return (
     <IonPage>
@@ -58,11 +57,9 @@ function RouteComponent() {
 
         <IonList>
           {watchedTvShows.tvShows.map(tvShow => (
-            <IonItem
-              routerLink={router.buildLocation({
-                to: '/tv-show/$id',
-                params: { id: tvShow.id },
-              }).href}
+            <RouterItem
+              to="/tv-show/$id"
+              params={{ id: tvShow.id }}
               key={tvShow.id}
             >
               {tvShow.poster_path && (
@@ -72,7 +69,7 @@ function RouteComponent() {
               )}
 
               {tvShow.name}
-            </IonItem>
+            </RouterItem>
           ))}
         </IonList>
       </IonContent>

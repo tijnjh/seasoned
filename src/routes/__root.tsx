@@ -1,6 +1,6 @@
-import { IonApp, setupIonicReact } from '@ionic/react'
+import { IonApp, IonLoading, setupIonicReact } from '@ionic/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { createRootRoute, HeadContent, Outlet, Scripts, useRouterState } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import stylesCss from '../styles.css?url'
 
@@ -34,6 +34,10 @@ export const Route = createRootRoute({
 const queryClient = new QueryClient()
 
 function RootComponent() {
+  const isNavigating = useRouterState({
+    select: state => state.isLoading,
+  })
+
   return (
     <StrictMode>
       <html lang="en">
@@ -43,6 +47,7 @@ function RootComponent() {
         <body>
           <QueryClientProvider client={queryClient}>
             <IonApp>
+              <IonLoading isOpen={isNavigating} />
               <Outlet />
             </IonApp>
           </QueryClientProvider>
