@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { RouterBackButton } from '#components/router-back-button'
 import { authClient } from '#lib/auth-client'
-import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, toggleWatchedEpisode } from '#lib/server-functions'
+import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, toggleWatchedEpisode, unmarkSeasonWatched } from '#lib/server-functions'
 
 export const Route = createFileRoute('/tv-show/$id_/$season')({
   params: {
@@ -69,8 +69,14 @@ function RouteComponent() {
     },
   })
 
-  const markSeasonWatchedMutation = useMutation({
-    mutationFn: async () => {
+  const seasonWatchedMutation = useMutation({
+    mutationFn: async (watched: boolean) => {
+      if (!watched) {
+        return await unmarkSeasonWatched({
+          data: { tvShowId: id, seasonId: tvSeason.id },
+        })
+      }
+
       return await markSeasonWatched({
         data: {
           tvShowId: id,
@@ -117,7 +123,7 @@ function RouteComponent() {
       </IonHeader>
 
       <IonLoading
-        isOpen={toggleEpisodeMutation.isPending || markSeasonWatchedMutation.isPending}
+        isOpen={toggleEpisodeMutation.isPending || seasonWatchedMutation.isPending}
       />
 
       <IonContent>
@@ -137,7 +143,7 @@ function RouteComponent() {
           </div>
         )}
 
-        {(toggleEpisodeMutation.isError || markSeasonWatchedMutation.isError) && (
+        {(toggleEpisodeMutation.isError || seasonWatchedMutation.isError) && (
           <p role="alert">Could not save your watch history. Please try again.</p>
         )}
 
@@ -161,12 +167,12 @@ function RouteComponent() {
               type="button"
               color={allEpisodesWatched ? 'success' : 'primary'}
               fill={allEpisodesWatched ? 'solid' : 'outline'}
-              onClick={() => markSeasonWatchedMutation.mutate()}
+              onClick={() => seasonWatchedMutation.mutate(!allEpisodesWatched)}
             >
-              {markSeasonWatchedMutation.isPending
+              {seasonWatchedMutation.isPending
                 ? 'Saving…'
                 : allEpisodesWatched
-                  ? 'All watched'
+                  ? 'Mark unwatched'
                   : 'Mark all watched'}
             </IonButton>
           </IonItem>

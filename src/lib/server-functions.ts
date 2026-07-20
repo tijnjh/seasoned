@@ -143,6 +143,27 @@ export const markSeasonWatched = createServerFn({ method: 'POST' })
     }
   })
 
+export const unmarkSeasonWatched = createServerFn({ method: 'POST' })
+  .validator(v.object({
+    tvShowId: v.number(),
+    seasonId: v.number(),
+  }))
+  .handler(async ({ data }) => {
+    const historyStore = await getWatchHistoryStore()
+
+    if (!historyStore) {
+      throw new Error('You must be signed in to save watched episodes.')
+    }
+
+    const watchHistory = await readWatchHistory(historyStore)
+    watchHistory.watchedEpisodes = watchHistory.watchedEpisodes.filter(episode =>
+      episode.tvShowId !== data.tvShowId || episode.seasonId !== data.seasonId,
+    )
+    await historyStore.write(watchHistory)
+
+    return { signedIn: true, episodeIds: [] }
+  })
+
 export const toggleWatchedEpisode = createServerFn({ method: 'POST' })
   .validator(v.object({
     tvShowId: v.number(),
