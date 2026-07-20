@@ -107,8 +107,11 @@ function RouteComponent() {
           <IonTitle>
             {tvShow.name}
             {' '}
-            - season
-            {tvSeason.season_number || tvSeason.name}
+            -
+            {' '}
+            {tvSeason.season_number === 0
+              ? tvSeason.name
+              : `Season ${tvSeason.season_number}`}
           </IonTitle>
         </IonToolbar>
       </IonHeader>
