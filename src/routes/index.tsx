@@ -43,7 +43,7 @@ function RouteComponent() {
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">
-              Frontpage
+              Episcoped
             </IonTitle>
           </IonToolbar>
         </IonHeader>
@@ -78,6 +78,9 @@ function RouteComponent() {
             )
             const allWatched = totalEpisodeCount > 0
               && watchedEpisodeCount >= totalEpisodeCount
+            const badgeColor = allWatched
+              ? 'success'
+              : watchedEpisodeCount > 0 ? 'warning' : 'medium'
 
             return (
               <RouterItem
@@ -95,7 +98,8 @@ function RouteComponent() {
 
                 <IonBadge
                   slot="end"
-                  color={allWatched ? 'success' : 'medium'}
+                  color={badgeColor}
+                  aria-label={`${watchedEpisodeCount} of ${totalEpisodeCount} episodes watched`}
                 >
                   {watchedEpisodeCount}
                   /

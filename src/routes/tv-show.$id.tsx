@@ -56,6 +56,9 @@ function RouteComponent() {
               .countsBySeasonId[String(season.id)] ?? 0
             const allWatched = season.episode_count > 0
               && watchedCount >= season.episode_count
+            const badgeColor = allWatched
+              ? 'success'
+              : watchedCount > 0 ? 'warning' : 'medium'
 
             return (
               <RouterItem
@@ -67,7 +70,8 @@ function RouteComponent() {
 
                 <IonBadge
                   slot="end"
-                  color={allWatched ? 'success' : 'medium'}
+                  color={badgeColor}
+                  aria-label={`${watchedCount} of ${season.episode_count} episodes watched`}
                 >
                   {watchedCount}
                   /
