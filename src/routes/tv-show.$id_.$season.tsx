@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
+import { IonButton, IonContent, IonHeader, IonItem, IonLabel, IonList, IonNote, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { authClient } from '#lib/auth-client'
@@ -111,10 +111,9 @@ function RouteComponent() {
                   {`${episode.episode_number}. ${episode.name}`}
                 </IonLabel>
 
-                <IonLabel color="medium">
+                <IonNote color="medium">
                   {episode.overview}
-                </IonLabel>
-
+                </IonNote>
               </IonToggle>
             </IonItem>
           ))}

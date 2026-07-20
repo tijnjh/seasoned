@@ -1,11 +1,19 @@
-import { IonContent, IonHeader, IonPage, IonSearchbar } from '@ionic/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { IonAvatar, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonSearchbar, IonToolbar } from '@ionic/react'
+import { createFileRoute, useRouteContext, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
+import { getWatchedTvShows } from '#lib/server-functions'
+import { getSrcFromPath } from '#lib/utils'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
+
   ssr: 'data-only',
+
+  loader: async () => {
+    const watchedTvShows = await getWatchedTvShows()
+    return { watchedTvShows }
+  },
 })
 
 function RouteComponent() {
@@ -13,10 +21,18 @@ function RouteComponent() {
 
   const [query, setQuery] = useState<string | undefined>(undefined)
 
+  const { watchedTvShows } = Route.useLoaderData()
+
+  const router = useRouter()
+
   return (
     <IonPage>
       <IonHeader>
-        <AuthButton />
+        <IonToolbar>
+          <IonButtons slot="end">
+            <AuthButton />
+          </IonButtons>
+        </IonToolbar>
       </IonHeader>
 
       <IonContent>
@@ -39,7 +55,28 @@ function RouteComponent() {
             value={query}
           />
         </form>
+
+        <IonList>
+          {watchedTvShows.tvShows.map(tvShow => (
+            <IonItem
+              routerLink={router.buildLocation({
+                to: '/tv-show/$id',
+                params: { id: tvShow.id },
+              }).href}
+              key={tvShow.id}
+            >
+              {tvShow.poster_path && (
+                <IonAvatar slot="start">
+                  <img src={getSrcFromPath(tvShow.poster_path)} />
+                </IonAvatar>
+              )}
+
+              {tvShow.name}
+            </IonItem>
+          ))}
+        </IonList>
       </IonContent>
+
     </IonPage>
   )
 }

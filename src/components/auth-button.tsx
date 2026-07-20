@@ -1,16 +1,15 @@
-import { IonButton } from '@ionic/react'
+import { IonButton, IonSpinner } from '@ionic/react'
 import { authClient } from '#lib/auth-client'
 
 export function AuthButton() {
   const { data: session, isPending } = authClient.useSession()
 
   if (isPending)
-    return null
+    return <IonSpinner />
 
   if (!session) {
     return (
       <IonButton
-        type="button"
         onClick={() =>
           authClient.signIn.social({
             provider: 'google',
@@ -23,15 +22,12 @@ export function AuthButton() {
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <span>{session.user.name}</span>
-
-      <IonButton
-        type="button"
-        onClick={() => authClient.signOut()}
-      >
-        Sign out
-      </IonButton>
-    </div>
+    <IonButton
+      onClick={() => authClient.signOut()}
+    >
+      {session.user.name}
+      {' '}
+      - sign out?
+    </IonButton>
   )
 }

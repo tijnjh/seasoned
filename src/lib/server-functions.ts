@@ -49,6 +49,24 @@ export const getWatchedEpisodes = createServerFn()
     return { signedIn: true, episodeIds }
   })
 
+export const getWatchedTvShows = createServerFn()
+  .handler(async () => {
+    const historyStore = await getWatchHistoryStore()
+
+    if (!historyStore)
+      return { signedIn: false, tvShows: [] }
+
+    const watchHistory = await readWatchHistory(historyStore)
+    const tvShowIds = new Set(
+      watchHistory.watchedEpisodes.map(episode => episode.tvShowId),
+    )
+    const tvShows = await Promise.all(
+      [...tvShowIds].map(id => tmdb.tvShows.details(id)),
+    )
+
+    return { signedIn: true, tvShows }
+  })
+
 export const toggleWatchedEpisode = createServerFn({ method: 'POST' })
   .validator(v.object({
     tvShowId: v.number(),
