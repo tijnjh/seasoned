@@ -25,7 +25,7 @@ export function HomePage() {
           <IonButtons slot="end">
             <AuthButton />
           </IonButtons>
-          <IonTitle>Episcoped</IonTitle>
+          <IonTitle>Seasoned</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -33,7 +33,7 @@ export function HomePage() {
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">
-              Episcoped
+              Seasoned
             </IonTitle>
           </IonToolbar>
         </IonHeader>
