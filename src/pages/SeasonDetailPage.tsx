@@ -78,12 +78,6 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
   const watchedEpisodeCount = tvSeasonQuery.data?.episodes.filter(episode => watchedEpisodeIds.has(episode.id)).length
   const allEpisodesWatched = (tvSeasonQuery.data?.episodes.length ?? 0) > 0 && watchedEpisodeCount === tvSeasonQuery.data?.episodes.length
 
-  const isLoading = [
-    tvShowQuery,
-    tvSeasonQuery,
-    watchedEpisodesQuery,
-  ].some(query => query.isLoading)
-
   return (
     <IonPage>
       <IonHeader>
@@ -131,7 +125,7 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
       />
 
       <IonContent color="light">
-        {isLoading
+        {tvSeasonQuery.isLoading
           ? <IonSpinner className="my-8 w-full" />
           : (
               <>
@@ -142,12 +136,16 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
                 <IonList>
                   {tvSeasonQuery.data?.episodes.map(episode => (
                     <IonItem key={episode.id}>
-                      <IonCheckbox
-                        slot="start"
-                        checked={watchedEpisodeIds.has(episode.id)}
-                        onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
-                        disabled={checkIfFutureDate(episode.air_date)}
-                      />
+                      {watchedEpisodesQuery.isLoading
+                        ? <IonSpinner slot="start" />
+                        : (
+                            <IonCheckbox
+                              slot="start"
+                              checked={watchedEpisodeIds.has(episode.id)}
+                              onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
+                              disabled={checkIfFutureDate(episode.air_date)}
+                            />
+                          )}
                       <span className="truncate">{`${episode.episode_number}. ${episode.name}`}</span>
 
                       <IonLabel>
