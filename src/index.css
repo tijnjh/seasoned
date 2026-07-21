@@ -102,3 +102,9 @@
     --elevated: var(--dark-gray-6);
   }
 }
+
+ion-content::part(scroll) {
+  width: 100%;
+  max-width: 700px;
+  margin-inline: auto;
+}
