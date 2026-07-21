@@ -14,19 +14,28 @@ const handler = defineEventHandler(async (event) => {
   }
 
   const watchHistory = await readWatchHistory(historyStore)
-  const watchedEpisodeCountsByTvShowId: Record<string, number> = {}
-
-  for (const episode of watchHistory.watchedEpisodes) {
-    const tvShowId = String(episode.tvShowId)
-    watchedEpisodeCountsByTvShowId[tvShowId] = (watchedEpisodeCountsByTvShowId[tvShowId] ?? 0) + 1
-  }
-
   const tvShowIds = new Set(
     watchHistory.watchedEpisodes.map(episode => episode.tvShowId),
   )
   const tvShows = await Promise.all(
     [...tvShowIds].map(id => tmdb.tvShows.details(id)),
   )
+  const specialSeasonIds = new Set(
+    tvShows.flatMap(tvShow =>
+      tvShow.seasons
+        .filter(season => season.season_number === 0)
+        .map(season => season.id),
+    ),
+  )
+  const watchedEpisodeCountsByTvShowId: Record<string, number> = {}
+
+  for (const episode of watchHistory.watchedEpisodes) {
+    if (specialSeasonIds.has(episode.seasonId))
+      continue
+
+    const tvShowId = String(episode.tvShowId)
+    watchedEpisodeCountsByTvShowId[tvShowId] = (watchedEpisodeCountsByTvShowId[tvShowId] ?? 0) + 1
+  }
 
   return {
     signedIn: true,
