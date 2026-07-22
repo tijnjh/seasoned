@@ -1,5 +1,6 @@
-import { IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
+import { IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
 import { downloadOutline, pushOutline } from 'ionicons/icons'
+import * as icon from 'ionicons/icons'
 import { AuthButton } from '#components/auth-button'
 
 export function SettingsPage() {
@@ -14,7 +15,7 @@ export function SettingsPage() {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent color="light">
+      <IonContent fullscreen color="light">
         <IonHeader collapse="condense">
           <IonToolbar color="light">
             <IonTitle size="large">Settings</IonTitle>
@@ -23,19 +24,13 @@ export function SettingsPage() {
 
         <IonList inset>
           <IonItem button detail routerLink="/settings/import">
-            <IonIcon slot="start" icon={pushOutline} color="primary" />
-            <IonLabel>
-              <h2>Import Watch History</h2>
-              <p>Restore watched episodes from a JSON file</p>
-            </IonLabel>
+            <IonIcon slot="start" icon={icon.pushOutline} color="primary" />
+            Import Watch History
           </IonItem>
 
           <IonItem button detail routerLink="/settings/export">
-            <IonIcon slot="start" icon={downloadOutline} color="primary" />
-            <IonLabel>
-              <h2>Export Watch History</h2>
-              <p>View or download your watched episodes</p>
-            </IonLabel>
+            <IonIcon slot="start" icon={icon.downloadOutline} color="primary" />
+            Export Watch History
           </IonItem>
         </IonList>
       </IonContent>

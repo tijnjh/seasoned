@@ -72,7 +72,6 @@ export function ImportWatchHistoryPage() {
             <IonIcon slot="start" icon={documentOutline} color="primary" />
             <IonLabel>
               <h2>Select JSON File</h2>
-              <p>Choose a Seasoned watch history export</p>
             </IonLabel>
             <input
               ref={fileInputRef}
