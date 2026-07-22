@@ -1,7 +1,7 @@
 import { IonApp, IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, setupIonicReact } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { homeOutline, searchOutline, settingsOutline } from 'ionicons/icons'
+import * as icon from 'ionicons/icons'
 import { Route } from 'react-router'
 import { ExportWatchHistoryPage } from './pages/ExportWatchHistoryPage.tsx'
 import { HomePage } from './pages/HomePage.tsx'
@@ -38,17 +38,17 @@ export default function App() {
 
             <IonTabBar slot="bottom">
               <IonTabButton tab="home" href="/">
-                <IonIcon icon={homeOutline} />
+                <IonIcon icon={icon.home} />
                 <IonLabel>Home</IonLabel>
               </IonTabButton>
 
               <IonTabButton tab="search" href="/search">
-                <IonIcon icon={searchOutline} />
+                <IonIcon icon={icon.search} />
                 <IonLabel>Search</IonLabel>
               </IonTabButton>
 
               <IonTabButton tab="settings" href="/settings">
-                <IonIcon icon={settingsOutline} />
+                <IonIcon icon={icon.settings} />
                 <IonLabel>Settings</IonLabel>
               </IonTabButton>
             </IonTabBar>

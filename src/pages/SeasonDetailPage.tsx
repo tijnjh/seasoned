@@ -121,10 +121,10 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
       </IonHeader>
 
       <IonLoading
-        isOpen={toggleEpisodeMutation.isPending || seasonWatchedMutation.isPending}
+        isOpen={seasonWatchedMutation.isPending}
       />
 
-      <IonContent color="light">
+      <IonContent>
         {tvSeasonQuery.isLoading
           ? <IonSpinner className="my-8 w-full" />
           : (
@@ -136,14 +136,14 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
                 <IonList>
                   {tvSeasonQuery.data?.episodes.map(episode => (
                     <IonItem key={episode.id}>
-                      {watchedEpisodesQuery.isLoading
-                        ? <IonSpinner slot="start" />
+                      {watchedEpisodesQuery.isLoading || (toggleEpisodeMutation.isPending && toggleEpisodeMutation.variables === episode.id)
+                        ? <IonSpinner slot="start" className="w-5.5" />
                         : (
                             <IonCheckbox
                               slot="start"
                               checked={watchedEpisodeIds.has(episode.id)}
                               onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
-                              disabled={checkIfFutureDate(episode.air_date)}
+                              disabled={checkIfFutureDate(episode.air_date) || toggleEpisodeMutation.isPending}
                             />
                           )}
                       <span className="truncate">{`${episode.episode_number}. ${episode.name}`}</span>

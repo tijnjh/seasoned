@@ -21,7 +21,7 @@ export function formatDate(
     day: 'numeric',
   },
 ) {
-  return new Intl.DateTimeFormat('en-uk', options).format(new Date(date)) // day month year is better :P
+  return new Intl.DateTimeFormat('en-GB', options).format(new Date(date))
 }
 
 export function checkIfFutureDate(date: string) {
