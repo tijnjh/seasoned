@@ -48,7 +48,7 @@ export default function App() {
               </IonTabButton>
 
               <IonTabButton tab="settings" href="/settings">
-                <IonIcon icon={icon.settings} />
+                <IonIcon icon={icon.cog} />
                 <IonLabel>Settings</IonLabel>
               </IonTabButton>
             </IonTabBar>
