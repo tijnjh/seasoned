@@ -1,4 +1,6 @@
 import type { MarkSeasonWatchedResponse } from '../../server/api/mark-season-watched.post'
+import type { ProtonAuthStartResponse } from '../../server/api/proton-auth/start.post'
+import type { ProtonAuthStatusResponse } from '../../server/api/proton-auth/status.get'
 import type { SearchResponse } from '../../server/api/search.get'
 import type { ToggleWatchedEpisodeResponse } from '../../server/api/toggle-watched-episode.post'
 import type { TvSeasonResponse } from '../../server/api/tv-season.get'
@@ -12,6 +14,20 @@ import { up } from 'up-fetch'
 const $fetch = up(fetch, () => ({
   baseUrl: '/api',
 }))
+
+export async function getProtonAuthStatus() {
+  return await $fetch<ProtonAuthStatusResponse>('/proton-auth/status')
+}
+
+export async function startProtonAuth() {
+  return await $fetch<ProtonAuthStartResponse>('/proton-auth/start', {
+    method: 'POST',
+  })
+}
+
+export async function logoutProton() {
+  return await $fetch('/proton-auth/logout', { method: 'POST' })
+}
 
 export async function search(q: string) {
   return await $fetch<SearchResponse>('/search', {

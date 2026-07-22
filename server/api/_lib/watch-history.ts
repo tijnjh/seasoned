@@ -1,8 +1,7 @@
 import type { EventHandlerRequest, H3Event } from 'nitro/h3'
-import type { AppDataStore } from './google-drive-app-data'
-import { drive, auth as googleAuth } from '@googleapis/drive'
-import { auth } from './auth'
-import { createGoogleDriveAppDataStore } from './google-drive-app-data'
+import { getProtonSessionId } from './proton-auth'
+import { getProtonLoginStatus } from './proton-cli'
+import { createProtonDriveAppDataStore } from './proton-drive-app-data'
 
 interface WatchedEpisode {
   tvShowId: number
@@ -14,41 +13,19 @@ interface WatchHistory {
   watchedEpisodes: WatchedEpisode[]
 }
 
+export interface AppDataStore<T> {
+  read: () => Promise<T | null>
+  write: (value: T) => Promise<void>
+}
+
 export async function getWatchHistoryStore(event: H3Event<EventHandlerRequest>) {
-  const headers = Object.fromEntries(event.req.headers.entries())
+  const sessionId = getProtonSessionId(event)
+  const status = await getProtonLoginStatus(sessionId)
 
-  const session = await auth.api.getSession({
-    headers,
-  })
-
-  if (!session) {
+  if (!sessionId || !status.signedIn)
     return
-  }
 
-  const tokenResult = await auth.api.getAccessToken({
-    body: { providerId: 'google' },
-    headers,
-    returnHeaders: true,
-  })
-
-  const setCookieHeaders = tokenResult.headers.getSetCookie()
-
-  if (setCookieHeaders.length > 0) {
-    setCookieHeaders.forEach(cookie => event.res.headers.append('set-cookie', cookie))
-  }
-
-  const oauth2Client = new googleAuth.OAuth2()
-
-  oauth2Client.setCredentials({
-    access_token: tokenResult.response.accessToken,
-  })
-
-  const googleDrive = drive({
-    version: 'v3',
-    auth: oauth2Client,
-  })
-
-  return createGoogleDriveAppDataStore<WatchHistory>(googleDrive)
+  return createProtonDriveAppDataStore<WatchHistory>(sessionId)
 }
 
 export async function readWatchHistory(

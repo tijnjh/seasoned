@@ -12,14 +12,13 @@
     "start": "node .output/server/index.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test test/*.test.ts"
   },
   "dependencies": {
-    "@googleapis/drive": "^20.2.0",
     "@ionic/react": "^8.7.11",
     "@ionic/react-router": "^8.7.11",
     "@tanstack/react-query": "^5.90.11",
-    "better-auth": "^1.6.23",
     "cnfast": "^0.0.8",
     "ionicons": "^8.0.13",
     "nitro": "3.0.260610-beta",
