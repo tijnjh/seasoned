@@ -4,9 +4,12 @@ import type { ToggleWatchedEpisodeResponse } from '../../server/api/toggle-watch
 import type { TvSeasonResponse } from '../../server/api/tv-season.get'
 import type { TvShowResponse } from '../../server/api/tv-show.get'
 import type { UnmarkSeasonWatchedResponse } from '../../server/api/unmark-season-watched.post'
+import type { WatchHistoryResponse } from '../../server/api/watch-history.get'
+import type { ImportWatchHistoryResponse } from '../../server/api/watch-history.post'
 import type { WatchedEpisodeCountsResponse } from '../../server/api/watched-episode-counts.get'
 import type { WatchedEpisodesResponse } from '../../server/api/watched-episodes.get'
 import type { WatchedTvShowsResponse } from '../../server/api/watched-tv-shows.get'
+import type { WatchHistory } from './watch-history'
 import { up } from 'up-fetch'
 
 const $fetch = up(fetch, () => ({
@@ -21,6 +24,17 @@ export async function search(q: string) {
 
 export async function getWatchedTvShows() {
   return await $fetch<WatchedTvShowsResponse>('/watched-tv-shows')
+}
+
+export async function getWatchHistory() {
+  return await $fetch<WatchHistoryResponse>('/watch-history')
+}
+
+export async function importWatchHistory(watchHistory: WatchHistory) {
+  return await $fetch<ImportWatchHistoryResponse>('/watch-history', {
+    method: 'POST',
+    body: watchHistory,
+  })
 }
 
 export async function getTvShow(tvShowId: number) {
