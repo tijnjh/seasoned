@@ -22,13 +22,16 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
 
   })
 
+  const seasonId = tvSeasonQuery.data?.id
+
   const watchedEpisodesQueryKey = ['watchedEpisodes', tvShowId, seasonNumber] as const
 
   const watchedEpisodesQuery = useQuery({
     queryKey: watchedEpisodesQueryKey,
+    enabled: seasonId !== undefined,
     queryFn: () => getWatchedEpisodes({
       tvShowId,
-      seasonId: tvSeasonQuery.data!.id,
+      seasonId: seasonId!,
     }),
     staleTime: Infinity,
   })
