@@ -1,5 +1,4 @@
 import { IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react'
-import { downloadOutline, pushOutline } from 'ionicons/icons'
 import * as icon from 'ionicons/icons'
 import { AuthButton } from '#components/auth-button'
 
