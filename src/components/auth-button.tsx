@@ -1,18 +1,18 @@
 import { IonActionSheet, IonButton, IonIcon, IonSpinner } from '@ionic/react'
-import { useRouter } from '@tanstack/react-router'
 import { logInOutline, logOutOutline, personCircleOutline } from 'ionicons/icons'
 import { useState } from 'react'
-import { authClient } from '#lib/auth-client'
+import { useHistory } from 'react-router'
+import { authClient } from '../lib/auth-client'
 
 export function AuthButton() {
   const [isAccountSheetOpen, setIsAccountSheetOpen] = useState(false)
   const { data: session, isPending } = authClient.useSession()
-  const router = useRouter()
+  const history = useHistory()
 
   async function signOut() {
     setIsAccountSheetOpen(false)
     await authClient.signOut()
-    await router.invalidate()
+    history.replace(history.location)
   }
 
   if (isPending) {
@@ -27,7 +27,7 @@ export function AuthButton() {
     )
   }
 
-  if (!session) {
+  if (!session?.user) {
     return (
       <IonButton
         fill="clear"
@@ -73,6 +73,7 @@ export function AuthButton() {
               void signOut()
             },
           },
+          { text: 'Cancel', role: 'cancel' },
         ]}
       />
     </>
