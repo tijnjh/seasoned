@@ -2,10 +2,11 @@ import type { TvShowDetails } from 'tmdb-ts'
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonLabel, IonList, IonListHeader, IonPage, IonSearchbar, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
 import { filterCircle, filterCircleOutline } from 'ionicons/icons'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
 import { TvShowListing } from '#components/tv-show-listing'
 import { getWatchedTvShows } from '#lib/api'
+import { getTvShowProgress } from '#lib/tv-show-progress'
 
 export function HomePage() {
   const { data: watchedTvShows, isLoading } = useQuery({
@@ -18,44 +19,22 @@ export function HomePage() {
   )
 
   const [filterString, setFilterString] = useState('')
-  const filteredTvShows = sortedTvShows.filter(tvShow => tvShow.name.toLowerCase().includes(filterString.toLowerCase()))
+  const searchTerm = filterString.trim().toLowerCase()
+  const filteredTvShows = sortedTvShows.filter(tvShow => tvShow.name.toLowerCase().includes(searchTerm))
 
   const [displayMode, setDisplayMode] = useState<'bucketed' | 'alphabetical'>('bucketed')
 
-  const tvShowBuckets = useMemo(() => {
-    const buckets = {
-      unfinished: [] as TvShowDetails[],
-      upToDate: [] as TvShowDetails[],
-      finished: [] as TvShowDetails[],
-    }
+  const tvShowBuckets = {
+    unfinished: [] as TvShowDetails[],
+    upToDate: [] as TvShowDetails[],
+    finished: [] as TvShowDetails[],
+  }
 
-    for (const tvShow of sortedTvShows) {
-      if (tvShow.status === 'Ended') {
-        buckets.finished.push(tvShow)
-        continue
-      }
-
-      const watchedEpisodeCount = watchedTvShows?.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
-      const totalEpisodeCount = tvShow.seasons.reduce(
-        (total, season) => total + (season.season_number === 0 ? 0 : season.episode_count),
-        0,
-      )
-
-      const allWatched = totalEpisodeCount > 0 && watchedEpisodeCount >= totalEpisodeCount
-
-      if (allWatched) {
-        buckets.upToDate.push(tvShow)
-        continue
-      }
-
-      if (watchedEpisodeCount > 0) {
-        buckets.unfinished.push(tvShow)
-        continue
-      }
-    }
-
-    return buckets
-  }, [sortedTvShows, watchedTvShows])
+  for (const tvShow of filteredTvShows) {
+    const watchedEpisodeCount = watchedTvShows?.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
+    const { bucket } = getTvShowProgress(tvShow, watchedEpisodeCount)
+    tvShowBuckets[bucket].push(tvShow)
+  }
 
   return (
     <IonPage>
@@ -64,8 +43,8 @@ export function HomePage() {
           <IonButtons slot="start">
             <IonButton
               fill="clear"
-              title="Sign in"
-              aria-label="Sign in"
+              title={displayMode === 'bucketed' ? 'Show alphabetically' : 'Group by progress'}
+              aria-label={displayMode === 'bucketed' ? 'Show alphabetically' : 'Group by progress'}
               onClick={() => setDisplayMode(prev => prev === 'bucketed' ? 'alphabetical' : 'bucketed')}
             >
               <IonIcon
@@ -97,7 +76,7 @@ export function HomePage() {
           debounce={100}
           value={filterString}
           placeholder="Filter tracked shows"
-          onIonInput={event => setFilterString(event.detail.value!)}
+          onIonInput={event => setFilterString(event.detail.value ?? '')}
         />
 
         {isLoading
@@ -105,7 +84,7 @@ export function HomePage() {
           : (
               <>
 
-                {filterString || displayMode === 'alphabetical'
+                {displayMode === 'alphabetical'
                   ? (
                       <IonList>
                         {filteredTvShows.map(tvShow => (

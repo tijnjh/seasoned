@@ -1,6 +1,7 @@
 import type { TV, TvShowDetails } from 'tmdb-ts'
 import type { WatchedTvShowsResponse } from '../../server/api/watched-tv-shows.get'
 import { IonAvatar, IonBadge, IonItem, IonLabel } from '@ionic/react'
+import { getTvShowProgress } from '#lib/tv-show-progress'
 import { getSrcFromPath } from '#lib/utils'
 
 export function TvShowListing({
@@ -39,21 +40,7 @@ function TvShowListingBadge({
     return
 
   const watchedEpisodeCount = watchedTvShows?.watchedEpisodeCountsByTvShowId[String(tvShow.id)] ?? 0
-  const totalEpisodeCount = tvShow.seasons.reduce(
-    (total, season) => total + (season.season_number === 0 ? 0 : season.episode_count),
-    0,
-  )
-  const allWatched = totalEpisodeCount > 0 && watchedEpisodeCount >= totalEpisodeCount
-
-  const badgeColor = (() => {
-    if (tvShow.status === 'Ended')
-      return 'tertiary'
-    if (allWatched)
-      return 'success'
-    if (watchedEpisodeCount > 0)
-      return 'warning'
-    return 'medium'
-  })()
+  const { totalEpisodeCount, badgeColor } = getTvShowProgress(tvShow, watchedEpisodeCount)
 
   return (
     <IonBadge
