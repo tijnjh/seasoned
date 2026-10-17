@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'nitro/h3'
 import { tmdb } from './_lib/tmdb'
-import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history'
+import { getWatchHistoryStore } from './_lib/watch-history'
 
 const handler = defineEventHandler(async (event) => {
   const historyStore = await getWatchHistoryStore(event)
@@ -13,29 +13,9 @@ const handler = defineEventHandler(async (event) => {
     }
   }
 
-  const watchHistory = await readWatchHistory(historyStore)
-  const tvShowIds = new Set(
-    watchHistory.watchedEpisodes.map(episode => episode.tvShowId),
-  )
-  const tvShows = await Promise.all(
-    [...tvShowIds].map(id => tmdb.tvShows.details(id)),
-  )
-  const specialSeasonIds = new Set(
-    tvShows.flatMap(tvShow =>
-      tvShow.seasons
-        .filter(season => season.season_number === 0)
-        .map(season => season.id),
-    ),
-  )
-  const watchedEpisodeCountsByTvShowId: Record<string, number> = {}
-
-  for (const episode of watchHistory.watchedEpisodes) {
-    if (specialSeasonIds.has(episode.seasonId))
-      continue
-
-    const tvShowId = String(episode.tvShowId)
-    watchedEpisodeCountsByTvShowId[tvShowId] = (watchedEpisodeCountsByTvShowId[tvShowId] ?? 0) + 1
-  }
+  const summaries = (await historyStore.listShows()).filter(show => show.totalCount > 0)
+  const tvShows = await Promise.all(summaries.map(show => tmdb.tvShows.details(show.tvShowId)))
+  const watchedEpisodeCountsByTvShowId = Object.fromEntries(summaries.map(show => [String(show.tvShowId), show.watchedCount]))
 
   return {
     signedIn: true,

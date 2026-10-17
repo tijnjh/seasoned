@@ -1,28 +1,25 @@
 import * as v from 'valibot'
 
-const watchedEpisodeSchema = v.strictObject({
-  tvShowId: v.pipe(v.number(), v.safeInteger(), v.minValue(1)),
-  seasonId: v.pipe(v.number(), v.safeInteger(), v.minValue(1)),
-  episodeId: v.pipe(v.number(), v.safeInteger(), v.minValue(1)),
+const id = v.pipe(v.string(), v.regex(/^[1-9]\d*$/), v.check(value => Number.isSafeInteger(Number(value))))
+const episodeIds = v.pipe(
+  v.array(v.pipe(v.number(), v.safeInteger(), v.minValue(1))),
+  v.check(ids => new Set(ids).size === ids.length, 'Episodes must not contain duplicates.'),
+)
+export const showHistorySchema = v.strictObject({
+  version: v.literal(2),
+  seasons: v.record(id, episodeIds),
 })
-
 export const watchHistorySchema = v.strictObject({
-  watchedEpisodes: v.pipe(
-    v.array(watchedEpisodeSchema),
-    v.check((episodes) => {
-      const keys = episodes.map(episode => `${episode.tvShowId}:${episode.seasonId}:${episode.episodeId}`)
-      return new Set(keys).size === keys.length
-    }, 'Watched episodes must not contain duplicates.'),
-  ),
+  version: v.literal(2),
+  shows: v.record(id, showHistorySchema),
 })
-
+export type ShowHistory = v.InferOutput<typeof showHistorySchema>
 export type WatchHistory = v.InferOutput<typeof watchHistorySchema>
 
+export function parseShowHistory(value: unknown): ShowHistory {
+  return v.parse(showHistorySchema, value)
+}
+
 export function parseWatchHistory(value: unknown): WatchHistory {
-  const result = v.safeParse(watchHistorySchema, value)
-
-  if (!result.success)
-    throw new Error(v.summarize(result.issues))
-
-  return result.output
+  return v.parse(watchHistorySchema, value)
 }

@@ -1,7 +1,7 @@
 import { defineEventHandler } from 'nitro/h3'
 import * as v from 'valibot'
 import { getSafeQuery } from './_lib/utils'
-import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history'
+import { getWatchHistoryStore } from './_lib/watch-history'
 
 const handler = defineEventHandler(async (event) => {
   const params = getSafeQuery(event, v.object({
@@ -15,13 +15,8 @@ const handler = defineEventHandler(async (event) => {
     return { signedIn: false, episodeIds: [] }
   }
 
-  const watchHistory = await readWatchHistory(historyStore)
-
-  const episodeIds = watchHistory.watchedEpisodes
-    .filter(episode =>
-      episode.tvShowId === params.tvShowId && episode.seasonId === params.seasonId,
-    )
-    .map(episode => episode.episodeId)
+  const show = await historyStore.readShow(params.tvShowId)
+  const episodeIds = show.seasons[params.seasonId] ?? []
 
   return {
     signedIn: true,

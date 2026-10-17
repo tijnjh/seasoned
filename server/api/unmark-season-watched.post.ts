@@ -1,7 +1,7 @@
 import { defineEventHandler } from 'nitro/h3'
 import * as v from 'valibot'
 import { getSafeQuery } from './_lib/utils'
-import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history'
+import { getWatchHistoryStore } from './_lib/watch-history'
 
 const handler = defineEventHandler(async (event) => {
   const params = getSafeQuery(event, v.object({
@@ -15,11 +15,9 @@ const handler = defineEventHandler(async (event) => {
     throw new Error('You must be signed in to save watched episodes.')
   }
 
-  const watchHistory = await readWatchHistory(historyStore)
-  watchHistory.watchedEpisodes = watchHistory.watchedEpisodes.filter(episode =>
-    episode.tvShowId !== params.tvShowId || episode.seasonId !== params.seasonId,
-  )
-  await historyStore.write(watchHistory)
+  await historyStore.updateShow(params.tvShowId, (show) => {
+    delete show.seasons[params.seasonId]
+  })
 
   return { signedIn: true, episodeIds: [] }
 })

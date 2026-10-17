@@ -26,8 +26,8 @@ export function ImportWatchHistoryPage() {
     onError: (cause) => {
       setError(cause instanceof SyntaxError
         ? 'This is not valid JSON.'
-        : cause instanceof Error && cause.message.includes('watchedEpisodes')
-          ? 'The JSON must contain a watchedEpisodes array with numeric TV show, season, and episode IDs.'
+        : cause instanceof Error && cause.message.includes('version')
+          ? 'Import a version 2 Seasoned watch history export.'
           : cause instanceof Error && cause.message.includes('duplicates')
             ? 'The watch history contains duplicate episodes.'
             : 'Could not import the watch history. Make sure you are signed in and try again.')
@@ -91,7 +91,7 @@ export function ImportWatchHistoryPage() {
               autoGrow
               rows={10}
               value={json}
-              placeholder={'{\n  "watchedEpisodes": []\n}'}
+              placeholder={'{\n  "version": 2,\n  "shows": {}\n}'}
               onIonInput={(event) => {
                 setJson(event.detail.value ?? '')
                 setError('')

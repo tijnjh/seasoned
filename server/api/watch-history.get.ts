@@ -1,5 +1,5 @@
 import { createError, defineEventHandler } from 'nitro/h3'
-import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history'
+import { getWatchHistoryStore } from './_lib/watch-history'
 
 const handler = defineEventHandler(async (event) => {
   const historyStore = await getWatchHistoryStore(event)
@@ -11,7 +11,7 @@ const handler = defineEventHandler(async (event) => {
     })
   }
 
-  return await readWatchHistory(historyStore)
+  return await historyStore.read()
 })
 
 export type WatchHistoryResponse = Awaited<ReturnType<typeof handler>>

@@ -2,7 +2,7 @@ import type { RouteComponentProps } from 'react-router'
 import { IonActionSheet, IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonLoading, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ellipsisHorizontal } from 'ionicons/icons'
-import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, toggleWatchedEpisode, unmarkSeasonWatched } from '#lib/api'
+import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, setWatchedEpisode, unmarkSeasonWatched } from '#lib/api'
 import { checkIfFutureDate, formatDate, seasonLabelByNumber } from '#lib/utils'
 
 export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: string, seasonNumber: string }>) {
@@ -37,16 +37,19 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
   })
 
   const toggleEpisodeMutation = useMutation({
-    mutationFn: async (episodeId: number) => {
-      return await toggleWatchedEpisode({
+    scope: { id: `watch-history-${tvShowId}` },
+    mutationFn: async ({ episodeId, watched }: { episodeId: number, watched: boolean }) => {
+      return await setWatchedEpisode({
         tvShowId,
         seasonId: tvSeasonQuery.data!.id,
         episodeId,
+        watched,
       })
     },
 
     onSuccess: (data) => {
       queryClient.setQueryData(watchedEpisodesQueryKey, data)
+      void queryClient.invalidateQueries({ queryKey: ['watched-tv-shows'] })
       void queryClient.invalidateQueries({
         queryKey: ['watchedEpisodeCounts', tvShowId],
       })
@@ -54,6 +57,7 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
   })
 
   const seasonWatchedMutation = useMutation({
+    scope: { id: `watch-history-${tvShowId}` },
     mutationFn: async (watched: boolean) => {
       if (!watched) {
         return await unmarkSeasonWatched({
@@ -71,6 +75,7 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
 
     onSuccess: (data) => {
       queryClient.setQueryData(watchedEpisodesQueryKey, data)
+      void queryClient.invalidateQueries({ queryKey: ['watched-tv-shows'] })
       void queryClient.invalidateQueries({
         queryKey: ['watchedEpisodeCounts', tvShowId],
       })
@@ -139,13 +144,13 @@ export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: stri
                 <IonList>
                   {tvSeasonQuery.data?.episodes.map(episode => (
                     <IonItem key={episode.id}>
-                      {watchedEpisodesQuery.isLoading || (toggleEpisodeMutation.isPending && toggleEpisodeMutation.variables === episode.id)
+                      {watchedEpisodesQuery.isLoading || (toggleEpisodeMutation.isPending && toggleEpisodeMutation.variables?.episodeId === episode.id)
                         ? <IonSpinner slot="start" className="w-5.5" />
                         : (
                             <IonCheckbox
                               slot="start"
                               checked={watchedEpisodeIds.has(episode.id)}
-                              onIonChange={() => toggleEpisodeMutation.mutate(episode.id)}
+                              onIonChange={event => toggleEpisodeMutation.mutate({ episodeId: episode.id, watched: event.detail.checked })}
                               disabled={checkIfFutureDate(episode.air_date) || toggleEpisodeMutation.isPending}
                             />
                           )}

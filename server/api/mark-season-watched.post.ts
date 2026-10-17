@@ -2,7 +2,7 @@ import { defineEventHandler } from 'nitro/h3'
 import * as v from 'valibot'
 import { tmdb } from './_lib/tmdb'
 import { getSafeQuery } from './_lib/utils'
-import { getWatchHistoryStore, readWatchHistory } from './_lib/watch-history'
+import { getWatchHistoryStore } from './_lib/watch-history'
 
 const handler = defineEventHandler(async (event) => {
   const params = getSafeQuery(event, v.object({
@@ -26,22 +26,14 @@ const handler = defineEventHandler(async (event) => {
     throw new Error('The requested season could not be verified.')
   }
 
-  const watchHistory = await readWatchHistory(historyStore)
-  const otherEpisodes = watchHistory.watchedEpisodes.filter(episode =>
-    episode.tvShowId !== params.tvShowId || episode.seasonId !== params.seasonId,
-  )
-  const watchedEpisodes = season.episodes.map(episode => ({
-    tvShowId: params.tvShowId,
-    seasonId: params.seasonId,
-    episodeId: episode.id,
-  }))
-
-  watchHistory.watchedEpisodes = [...otherEpisodes, ...watchedEpisodes]
-  await historyStore.write(watchHistory)
+  const episodeIds = season.episodes.map(episode => episode.id)
+  await historyStore.updateShow(params.tvShowId, (show) => {
+    show.seasons[params.seasonId] = episodeIds
+  })
 
   return {
     signedIn: true,
-    episodeIds: watchedEpisodes.map(episode => episode.episodeId),
+    episodeIds,
   }
 })
 

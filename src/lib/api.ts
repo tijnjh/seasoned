@@ -1,6 +1,6 @@
 import type { MarkSeasonWatchedResponse } from '../../server/api/mark-season-watched.post'
 import type { SearchResponse } from '../../server/api/search.get'
-import type { ToggleWatchedEpisodeResponse } from '../../server/api/toggle-watched-episode.post'
+import type { SetWatchedEpisodeResponse } from '../../server/api/set-watched-episode.post'
 import type { TvSeasonResponse } from '../../server/api/tv-season.get'
 import type { TvShowResponse } from '../../server/api/tv-show.get'
 import type { UnmarkSeasonWatchedResponse } from '../../server/api/unmark-season-watched.post'
@@ -73,18 +73,20 @@ export async function getTvSeason({
   })
 }
 
-export async function toggleWatchedEpisode({
+export async function setWatchedEpisode({
   tvShowId,
   seasonId,
   episodeId,
+  watched,
 }: {
   tvShowId: number
   seasonId: number
   episodeId: number
+  watched: boolean
 }) {
-  return await $fetch<ToggleWatchedEpisodeResponse>('/toggle-watched-episode', {
+  return await $fetch<SetWatchedEpisodeResponse>('/set-watched-episode', {
     method: 'POST',
-    params: { tvShowId, seasonId, episodeId },
+    params: { tvShowId, seasonId, episodeId, watched },
   })
 }
 
