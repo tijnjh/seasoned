@@ -1,13 +1,15 @@
-import type { RouteComponentProps } from 'react-router'
 import type { Season } from 'tmdb-ts/dist/types/tv-shows'
 import type { WatchedEpisodeCountsResponse } from '../../server/api/watched-episode-counts.get'
 import { IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
 import { getTvShow, getWatchedEpisodeCounts } from '#lib/api'
 import { seasonLabelByNumber } from '#lib/utils'
 
-export function TvShowDetailPage({ match }: RouteComponentProps<{ tvShowId: string }>) {
-  const tvShowId = Number(match.params.tvShowId)
+export function TvShowDetailPage() {
+  const params = useParams<{ tvShowId: string }>()
+
+  const tvShowId = Number(params.tvShowId)
 
   const tvShowQuery = useQuery({
     queryKey: ['tv-show', tvShowId],

@@ -27,13 +27,13 @@ export default function App() {
         <IonReactRouter>
           <IonTabs>
             <IonRouterOutlet>
-              <Route exact path="/" component={HomePage} />
-              <Route exact path="/search" component={SearchPage} />
-              <Route exact path="/settings" component={SettingsPage} />
-              <Route exact path="/settings/import" component={ImportWatchHistoryPage} />
-              <Route exact path="/settings/export" component={ExportWatchHistoryPage} />
-              <Route exact path="/tv-show/:tvShowId" component={TvShowDetailPage} />
-              <Route exact path="/tv-show/:tvShowId/:seasonNumber" component={SeasonDetailPage} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings/import" element={<ImportWatchHistoryPage />} />
+              <Route path="/settings/export" element={<ExportWatchHistoryPage />} />
+              <Route path="/tv-show/:tvShowId" element={<TvShowDetailPage />} />
+              <Route path="/tv-show/:tvShowId/:seasonNumber" element={<SeasonDetailPage />} />
             </IonRouterOutlet>
 
             <IonTabBar slot="bottom">

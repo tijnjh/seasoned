@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, readBody } from 'nitro/h3'
+import { defineEventHandler, HTTPError, readBody } from 'nitro/h3'
 import { parseWatchHistory } from '../../src/lib/watch-history'
 import { getWatchHistoryStore } from './_lib/watch-history'
 
@@ -6,7 +6,7 @@ const handler = defineEventHandler(async (event) => {
   const historyStore = await getWatchHistoryStore(event)
 
   if (!historyStore) {
-    throw createError({
+    throw new HTTPError({
       statusCode: 401,
       statusMessage: 'Sign in to import your watch history.',
     })
@@ -18,7 +18,7 @@ const handler = defineEventHandler(async (event) => {
     watchHistory = parseWatchHistory(await readBody(event))
   }
   catch {
-    throw createError({
+    throw new HTTPError({
       statusCode: 400,
       statusMessage: 'Invalid watch history file.',
     })

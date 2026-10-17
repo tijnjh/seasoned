@@ -1,5 +1,5 @@
 import type { EventHandlerRequest, H3Event } from 'nitro/h3'
-import { drive, auth as googleAuth } from '@googleapis/drive'
+import { drive, auth as googleAuth } from '@googleapis/drive/'
 import { auth } from './auth'
 import { createGoogleDriveAppDataStore } from './google-drive-app-data'
 
@@ -15,7 +15,7 @@ export async function getWatchHistoryStore(event: H3Event<EventHandlerRequest>) 
   }
 
   const tokenResult = await auth.api.getAccessToken({
-    body: { providerId: 'google' },
+    body: { useAccountCookie: true },
     headers,
     returnHeaders: true,
   })

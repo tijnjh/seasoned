@@ -1,13 +1,18 @@
-import type { RouteComponentProps } from 'react-router'
 import { IonActionSheet, IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonLoading, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ellipsisHorizontal } from 'ionicons/icons'
+import { useParams } from 'react-router-dom'
 import { getTvSeason, getTvShow, getWatchedEpisodes, markSeasonWatched, setWatchedEpisode, unmarkSeasonWatched } from '#lib/api'
 import { checkIfFutureDate, formatDate, seasonLabelByNumber } from '#lib/utils'
 
-export function SeasonDetailPage({ match }: RouteComponentProps<{ tvShowId: string, seasonNumber: string }>) {
-  const tvShowId = Number(match.params.tvShowId)
-  const seasonNumber = Number(match.params.seasonNumber)
+export function SeasonDetailPage() {
+  const params = useParams<{
+    tvShowId: string
+    seasonNumber: string
+  }>()
+
+  const tvShowId = Number(params.tvShowId)
+  const seasonNumber = Number(params.seasonNumber)
 
   const queryClient = useQueryClient()
 

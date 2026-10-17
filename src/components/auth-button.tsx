@@ -1,18 +1,19 @@
 import { IonActionSheet, IonButton, IonIcon, IonSpinner } from '@ionic/react'
 import { logInOutline, logOutOutline, personCircleOutline } from 'ionicons/icons'
 import { useState } from 'react'
-import { useHistory } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { authClient } from '../lib/auth-client'
 
 export function AuthButton() {
   const [isAccountSheetOpen, setIsAccountSheetOpen] = useState(false)
   const { data: session, isPending } = authClient.useSession()
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   async function signOut() {
     setIsAccountSheetOpen(false)
     await authClient.signOut()
-    history.replace(history.location)
+    navigate(location, { replace: true })
   }
 
   if (isPending) {

@@ -1,11 +1,11 @@
 import { IonSearchbar } from '@ionic/react'
 import { useState } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 export function Searchbar({ initialValue }: { initialValue?: string }) {
   const [query, setQuery] = useState<string | undefined>(initialValue)
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <form onSubmit={(e) => {
@@ -16,7 +16,7 @@ export function Searchbar({ initialValue }: { initialValue?: string }) {
       if (!q)
         return
 
-      history.push({
+      navigate({
         pathname: '/search',
         search: `?q=${encodeURIComponent(q)}`,
       })
