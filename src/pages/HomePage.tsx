@@ -2,6 +2,7 @@ import type { TvShowDetails } from 'tmdb-ts'
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonLabel, IonList, IonListHeader, IonPage, IonSearchbar, IonSpinner, IonTitle, IonToolbar } from '@ionic/react'
 import { useQuery } from '@tanstack/react-query'
 import { filterCircle, filterCircleOutline } from 'ionicons/icons'
+import { hapticTrigger } from 'ios-haptics'
 import { useState } from 'react'
 import { AuthButton } from '#components/auth-button'
 import { TvShowListing } from '#components/tv-show-listing'
@@ -42,6 +43,7 @@ export function HomePage() {
         <IonToolbar>
           <IonButtons slot="start">
             <IonButton
+              ref={hapticTrigger}
               fill="clear"
               title={displayMode === 'bucketed' ? 'Show alphabetically' : 'Group by progress'}
               aria-label={displayMode === 'bucketed' ? 'Show alphabetically' : 'Group by progress'}

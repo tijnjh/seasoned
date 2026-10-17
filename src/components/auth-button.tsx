@@ -1,24 +1,25 @@
 import { IonActionSheet, IonButton, IonIcon, IonSpinner } from '@ionic/react'
 import { logInOutline, logOutOutline, personCircleOutline } from 'ionicons/icons'
+import { hapticTrigger } from 'ios-haptics'
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { authClient } from '../lib/auth-client'
 
 export function AuthButton() {
   const [isAccountSheetOpen, setIsAccountSheetOpen] = useState(false)
   const { data: session, isPending } = authClient.useSession()
   const navigate = useNavigate()
-  const location = useLocation()
 
   async function signOut() {
     setIsAccountSheetOpen(false)
     await authClient.signOut()
-    navigate(location, { replace: true })
+    navigate(0)
   }
 
   if (isPending) {
     return (
       <IonButton
+        ref={hapticTrigger}
         fill="clear"
         disabled
         aria-label="Loading account"
@@ -48,6 +49,7 @@ export function AuthButton() {
   return (
     <>
       <IonButton
+        ref={hapticTrigger}
         fill="clear"
         title={session.user.name}
         aria-label="Open account menu"
